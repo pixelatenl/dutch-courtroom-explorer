@@ -31,13 +31,14 @@ const DURATION_KEYS = [
   "A048444",
 ] as const;
 
-const DURATION_CHART: Record<string, number> = {
-  A048443: 4,
-  A048442: 3,
-  A048441: 2,
-  A048440: 1,
-  A048439: 5,
-  A048444: 2,
+/* Each duration category maps 1:1 onto its own stack palette token. */
+const DURATION_TOKEN: Record<string, string> = {
+  A048443: "var(--stack-1)",
+  A048442: "var(--stack-2)",
+  A048441: "var(--stack-3)",
+  A048440: "var(--stack-4)",
+  A048439: "var(--stack-5)",
+  A048444: "var(--stack-6)",
 };
 
 export function JailSnapshot() {
@@ -155,7 +156,7 @@ export function JailSnapshot() {
                         y={y(acc)}
                         width={barW}
                         height={Math.max(0, y(y0) - y(acc))}
-                        fill={`var(--chart-${DURATION_CHART[k]})`}
+                        fill={DURATION_TOKEN[k]}
                       />
                     </ChartTooltip>
                   );
@@ -172,7 +173,7 @@ export function JailSnapshot() {
         <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
           {DURATION_KEYS.map((k) => (
             <li key={k} className="inline-flex items-center gap-1.5">
-              <span aria-hidden="true" className="inline-block size-2.5 rounded-full" style={{ background: `var(--chart-${DURATION_CHART[k]})` }} />
+              <span aria-hidden="true" className="inline-block size-2.5 rounded-full" style={{ background: DURATION_TOKEN[k] }} />
               {labelFor(SENTENCE_DURATION_LABELS, k, k)}
             </li>
           ))}

@@ -107,6 +107,17 @@ export function MethodDrawer() {
         </section>
 
         <section>
+          <h3 className="font-semibold text-foreground">Rates, counts and the population register</h3>
+          <p className="mt-1">
+            Suspect rates are per 10,000 within each group's own population,
+            so a group rate is a weighted average of its subgroup rates,
+            never their sum. CBS counts include suspects who are not in the
+            municipal population register (GBA) while the rates do not, so
+            counts and rates do not reconstruct each other exactly.
+          </p>
+        </section>
+
+        <section>
           <h3 className="font-semibold text-foreground">Chip rule</h3>
           <p className="mt-1">
             A status chip compares the latest value of a series against the
@@ -159,12 +170,17 @@ export function MethodDrawer() {
           <h3 className="font-semibold text-foreground">Colour audit</h3>
           <p className="mt-1">
             The justice categorical tokens (four funnel stages, six offence
-            categories) are defined per theme in app/globals.css. Every token
-            clears 3 to 1 against both surfaces of its theme (page and card,
-            light and dark), and every adjacent pair of tokens clears 3 to 1
-            against each other; the full ratio table is documented in the
-            stylesheet comment. Hover and focus highlights use the family
-            brand accent.
+            categories, seven stacked-segment tokens) are defined per theme in
+            app/globals.css. Every token clears 3 to 1 against both surfaces
+            of its theme (page and card, light and dark), and every adjacent
+            pair of tokens clears 3 to 1 against each other; the full ratio
+            table is documented in the stylesheet comment. The stacked-segment
+            group (--stack-1..7) audits at 13.5-13.6 and 4.1-4.4 against the
+            light page (14.2-14.3 and 4.3-4.4 against the light card) with
+            neighbours 3.26-3.30, and at 12.0-12.1 and 3.7 against the dark
+            page (10.2 and 3.1-3.2 against the dark card) with neighbours
+            3.22-3.24. Hover and focus highlights use the family brand
+            accent.
           </p>
         </section>
 

@@ -27,7 +27,8 @@ import {
   Correlation cards: rates only, suspects per 10,000 inhabitants, each
   card with its own source year. Suppressed cells (null) render as
   gaps with a note, never as zero. Every bar carries the shared chart
-  tooltip with the raw count and the share of the card's total row.
+  tooltip with the raw count, the share of the card's total row, and
+  the denominator note (per-10,000 within the group's own population).
 */
 
 interface BarRow {
@@ -40,6 +41,18 @@ interface BarRow {
   /** Total row of the card, when the snapshot carries it. */
   total?: number | null;
 }
+
+/*
+  Denominator note carried by every correlation-card tooltip: each rate
+  is per 10,000 within the group's own population, so a group rate is a
+  weighted average of its subgroup rates, never a sum. Share bars
+  (detainee shares) carry the share wording instead, because subgroup
+  shares of a total do add up.
+*/
+const DENOMINATOR_NOTE =
+  "Each rate is per 10,000 within the group's own population, so a group rate is a weighted average of its subgroup rates, never a sum.";
+const SHARE_DENOMINATOR_NOTE =
+  "Denominator: all members of the group (all detainees that year), so this is a share of the group, not a per-10,000 rate.";
 
 /** Tooltip payload for one rate bar, derived from the snapshot row. */
 function barTooltip(r: BarRow): TooltipContent {
@@ -69,14 +82,21 @@ function barTooltip(r: BarRow): TooltipContent {
             ]
           : []),
       ];
-  return { title: r.label, rows };
+  return {
+    title: r.label,
+    rows,
+    footnote: r.percent ? SHARE_DENOMINATOR_NOTE : DENOMINATOR_NOTE,
+  };
 }
 
-const SUPPRESSED_TOOLTIP: TooltipContent = {
-  title: "",
-  rows: [{ label: "Value", value: "n/a, suppressed" }],
-  footnote: "Suppressed by CBS (.).",
-};
+/** Suppressed cells keep their note, plus the card's denominator note. */
+function suppressedTooltip(r: BarRow): TooltipContent {
+  return {
+    title: r.label,
+    rows: [{ label: "Value", value: "n/a, suppressed" }],
+    footnote: `Suppressed by CBS (.). ${r.percent ? SHARE_DENOMINATOR_NOTE : DENOMINATOR_NOTE}`,
+  };
+}
 
 function RateBars({ rows }: { rows: BarRow[] }) {
   const max = Math.max(
@@ -92,9 +112,7 @@ function RateBars({ rows }: { rows: BarRow[] }) {
               <span>{r.label}</span>
               <span className="tabular-nums text-muted-foreground">
                 {r.value === null ? (
-                  <ChartTooltip
-                    content={{ ...SUPPRESSED_TOOLTIP, title: r.label }}
-                  >
+                  <ChartTooltip content={suppressedTooltip(r)}>
                     <span>n/a, suppressed</span>
                   </ChartTooltip>
                 ) : (
@@ -220,12 +238,14 @@ export function CorrelationCards() {
   const recRepeat = recRows.find((r) => r.recidive === "A041522")?.count ?? null;
   const repeatShare =
     recTotal && recRepeat !== null && recTotal > 0 ? recRepeat / recTotal : null;
-  const recidivismBars: BarRow[] = recRows.map((r) => ({
-    label: labelFor(RECIDIVE_LABELS, r.recidive, r.recidive),
-    value: r.per10000,
-    count: r.count,
-    total: recTotal,
-  }));
+  const recidivismBars: BarRow[] = recRows
+    .filter((r) => r.recidive !== "T001278")
+    .map((r) => ({
+      label: labelFor(RECIDIVE_LABELS, r.recidive, r.recidive),
+      value: r.per10000,
+      count: r.count,
+      total: recTotal,
+    }));
 
   const detTotal =
     s.detainees.byPreviousDetention.find((r) => r.key === "T001670")?.count ??
@@ -237,13 +257,15 @@ export function CorrelationCards() {
     detTotal && detPrevious !== null && detTotal > 0
       ? detPrevious / detTotal
       : null;
-  const detentionBars: BarRow[] = s.detainees.byPreviousDetention.map((r) => ({
-    label: labelFor(PREVIOUS_DETENTION_LABELS, r.key, r.title),
-    value: r.count !== null && detTotal ? r.count / detTotal : null,
-    percent: true,
-    count: r.count,
-    total: detTotal,
-  }));
+  const detentionBars: BarRow[] = s.detainees.byPreviousDetention
+    .filter((r) => r.key !== "T001670")
+    .map((r) => ({
+      label: labelFor(PREVIOUS_DETENTION_LABELS, r.key, r.title),
+      value: r.count !== null && detTotal ? r.count / detTotal : null,
+      percent: true,
+      count: r.count,
+      total: detTotal,
+    }));
 
   return (
     <FamilySection
@@ -270,7 +292,7 @@ export function CorrelationCards() {
         <Card
           title="Background and generation"
           year={s.backgroundGeneration.year}
-          note="Migration background as registered by CBS; generation split among people with a migration background."
+          note="Migration background as registered by CBS; generation split among people with a migration background. Each rate is per 10,000 within the group's own population, so a group rate is a weighted average of its subgroup rates, never their sum. CBS counts include suspects who are not in the municipal population register (GBA) while the rates do not, so counts and rates do not reconstruct each other exactly."
         >
           <div className="flex flex-col gap-4">
             <RateBars rows={backgroundRows} />
