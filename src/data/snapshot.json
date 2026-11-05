@@ -2015,6 +2015,15 @@
         "key": "drugs",
         "label": "Drug offences",
         "count": 12880
+      },
+      {
+        "key": "sexualOffences",
+        "label": "Sexual offences",
+        "count": 3040,
+        "childIncludedIn": {
+          "key": "violence",
+          "label": "Violence"
+        }
       }
     ]
   },

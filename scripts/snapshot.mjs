@@ -191,6 +191,7 @@ const SUSPECT_OFFENCES = [
   ["TotaalVerkeersmisdrijven_23", "traffic", "Traffic offences"],
   ["RijdenOnderInvloed_25", "dui", "Driving under influence"],
   ["VerdachtenVanDrugsmisdrijven_26", "drugs", "Drug offences"],
+  ["SeksueelMisdrijf_22", "sexualOffences", "Sexual offences"],
 ];
 
 /*
@@ -198,8 +199,8 @@ const SUSPECT_OFFENCES = [
   the same totals row: no new HTTP source. Children are not additive
   parts of the group (they overlap and leave a remainder); where a
   child is itself one of the top-level bars (shoplifting, driving
-  under influence), the bar carries childIncludedIn naming the group
-  or child that already contains it.
+  under influence, sexual offences), the bar carries childIncludedIn
+  naming the group or child that already contains it.
 */
 const SUSPECT_OFFENCE_CHILDREN = {
   property: [
@@ -219,13 +220,16 @@ const SUSPECT_OFFENCE_CHILDREN = {
 const CHILD_INCLUDED_IN = {
   shoplifting: "theftBurglary",
   dui: "traffic",
+  sexualOffences: "violence",
 };
 
 const SUSPECT_OFFENCE_MEASURES = [
-  ...SUSPECT_OFFENCES.map(([m]) => m),
-  ...Object.values(SUSPECT_OFFENCE_CHILDREN)
-    .flat()
-    .map(([m]) => m),
+  ...new Set([
+    ...SUSPECT_OFFENCES.map(([m]) => m),
+    ...Object.values(SUSPECT_OFFENCE_CHILDREN)
+      .flat()
+      .map(([m]) => m),
+  ]),
 ];
 
 const SEX_TOTAL = "T001038";
