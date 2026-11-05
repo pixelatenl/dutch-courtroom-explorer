@@ -1,0 +1,38 @@
+name: Refresh data snapshot
+
+# Monthly server-side fetch of the CBS StatLine OData tables, the
+# Eurostat crim_pris_cap dataset and the hand-labeled DJI block.
+# Writes src/data/snapshot.json and commits it to main, which triggers
+# the build workflow. CBS and Eurostat publish annually, so a monthly
+# cadence is ample.
+
+on:
+  schedule:
+    # First Monday of the month, 04:10 UTC.
+    - cron: "10 4 1-7 * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: node scripts/snapshot.mjs
+      - name: Commit snapshot if changed
+        run: |
+          git config user.name "courtroom-snapshot-bot"
+          git config user.email "actions@github.com"
+          git add src/data/snapshot.json
+          if git diff --cached --quiet; then
+            echo "No snapshot changes."
+          else
+            git commit -m "data: refresh justice snapshot $(date -u +%F)"
+            git push
+          fi
