@@ -18,11 +18,12 @@ import {
   that are prison, fines, or community service, stacked to 100% per
   year from the first to the last justice year.
 */
+/* Each sanction type maps 1:1 onto its own stack palette token. */
 const SERIES = [
-  { key: "prison", label: "Prison", field: "prison" as const, chart: 4 },
-  { key: "fine", label: "Fine", field: "fine" as const, chart: 2 },
-  { key: "communityService", label: "Community service", field: "communityService" as const, chart: 3 },
-  { key: "otherPrincipal", label: "Other principal sanctions", field: "otherPrincipal" as const, chart: 5 },
+  { key: "prison", label: "Prison", field: "prison" as const, token: "var(--stack-1)" },
+  { key: "fine", label: "Fine", field: "fine" as const, token: "var(--stack-2)" },
+  { key: "communityService", label: "Community service", field: "communityService" as const, token: "var(--stack-3)" },
+  { key: "otherPrincipal", label: "Other principal sanctions", field: "otherPrincipal" as const, token: "var(--stack-4)" },
 ] as const;
 
 export function SanctionShift() {
@@ -121,7 +122,7 @@ export function SanctionShift() {
                         y={M.top + ih - acc * ih}
                         width={barW}
                         height={Math.max(0, ((count ?? 0) / (t || 1)) * ih)}
-                        fill={`var(--chart-${s.chart})`}
+                        fill={s.token}
                       />
                     </ChartTooltip>
                   );
@@ -149,7 +150,7 @@ export function SanctionShift() {
               <span
                 aria-hidden="true"
                 className="inline-block size-2.5 rounded-full"
-                style={{ background: `var(--chart-${s.chart})` }}
+                style={{ background: s.token }}
               />
               {s.label}
             </li>

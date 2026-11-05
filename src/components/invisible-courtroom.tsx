@@ -15,19 +15,18 @@ import {
 
 /*
   The invisible courtroom: 100% stacked bars of prosecutor (Openbaar
-  Ministerie) decisions per year, first to last justice year. The
-  summons share, the decision that actually reaches a courtroom, is
-  highlighted in the brand accent; the other categories use the
-  family chart ramp.
+  Ministerie) decisions per year, first to last justice year. Every
+  category maps 1:1 onto its own token of the product stack palette
+  (--stack-1..7), so no two segments share a color.
 */
 const CATEGORIES = [
-  { key: "summons", label: "Summons", field: "summons" as const, chart: 1, accent: true },
-  { key: "penaltyOrder", label: "Penalty order", field: "penaltyOrder" as const, chart: 1, accent: false },
-  { key: "transaction", label: "Transaction", field: "transaction" as const, chart: 2, accent: false },
-  { key: "summonsAfterObjection", label: "Summons after objection", field: "summonsAfterObjection" as const, chart: 3, accent: false },
-  { key: "conditionalDismissal", label: "Conditional dismissal", field: "conditionalDismissal" as const, chart: 4, accent: false },
-  { key: "unconditionalDismissal", label: "Unconditional dismissal", field: "unconditionalDismissal" as const, chart: 5, accent: false },
-  { key: "otherOM", label: "Other", field: "otherOM" as const, chart: 2, accent: false },
+  { key: "summons", label: "Summons", field: "summons" as const, token: "var(--stack-1)" },
+  { key: "penaltyOrder", label: "Penalty order", field: "penaltyOrder" as const, token: "var(--stack-2)" },
+  { key: "transaction", label: "Transaction", field: "transaction" as const, token: "var(--stack-3)" },
+  { key: "summonsAfterObjection", label: "Summons after objection", field: "summonsAfterObjection" as const, token: "var(--stack-4)" },
+  { key: "conditionalDismissal", label: "Conditional dismissal", field: "conditionalDismissal" as const, token: "var(--stack-5)" },
+  { key: "unconditionalDismissal", label: "Unconditional dismissal", field: "unconditionalDismissal" as const, token: "var(--stack-6)" },
+  { key: "otherOM", label: "Other", field: "otherOM" as const, token: "var(--stack-7)" },
 ] as const;
 
 export function InvisibleCourtroom() {
@@ -67,7 +66,7 @@ export function InvisibleCourtroom() {
         <svg
           viewBox={`0 0 ${W} ${H}`}
           role="img"
-          aria-label={`Stacked share of prosecutor decisions from ${firstJustice.year} to ${latestJustice.year}. The summons share is highlighted.`}
+          aria-label={`Stacked share of prosecutor decisions from ${firstJustice.year} to ${latestJustice.year}. The summons is the route into a courtroom.`}
           className="h-auto w-full"
         >
           {[0, 25, 50, 75, 100].map((t) => (
@@ -134,9 +133,7 @@ export function InvisibleCourtroom() {
                         y={M.top + ih - s.y1 * ih}
                         width={barW}
                         height={Math.max(0, (s.y1 - s.y0) * ih)}
-                        fill={
-                          s.accent ? "var(--brand-accent)" : `var(--chart-${s.chart})`
-                        }
+                        fill={s.token}
                       />
                     </ChartTooltip>
                   );
@@ -174,11 +171,7 @@ export function InvisibleCourtroom() {
               <span
                 aria-hidden="true"
                 className="inline-block size-2.5 rounded-full"
-                style={{
-                  background: c.accent
-                    ? "var(--brand-accent)"
-                    : `var(--chart-${c.chart})`,
-                }}
+                style={{ background: c.token }}
               />
               {c.label}
             </li>
