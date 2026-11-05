@@ -161,6 +161,12 @@ export function VanishingCrime() {
               <ChartTooltip
                 svg
                 key={cy.year}
+                crosshair={{
+                  markers:
+                    cy.totalPer1000 !== null
+                      ? [{ y: y(cy.totalPer1000), fill: "var(--chart-1)" }]
+                      : [],
+                }}
                 content={{
                   title: `${cy.year}`,
                   rows: [
