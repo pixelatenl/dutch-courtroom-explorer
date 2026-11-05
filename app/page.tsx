@@ -1,12 +1,12 @@
 import { FamilyHero } from "@/components/family-hero";
 import { StatCard } from "@/components/stat-card";
 import { VanishingCrime } from "@/components/vanishing-crime";
+import { DockChart } from "@/components/dock-chart";
 import { InvisibleCourtroom } from "@/components/invisible-courtroom";
 import { AbsorptionFunnel } from "@/components/absorption-funnel";
 import { SanctionShift } from "@/components/sanction-shift";
 import { ClearanceParadox } from "@/components/clearance-paradox";
 import { CorrelationCards } from "@/components/correlation-cards";
-import { DockChart } from "@/components/dock-chart";
 import { JailSnapshot } from "@/components/jail-snapshot";
 import { EuropeCells } from "@/components/europe-cells";
 import { OddsCoda } from "@/components/odds-coda";
@@ -75,12 +75,12 @@ export default function Home() {
         </section>
 
         <VanishingCrime />
+        <DockChart />
         <InvisibleCourtroom />
         <AbsorptionFunnel />
         <SanctionShift />
         <ClearanceParadox />
         <CorrelationCards />
-        <DockChart />
         <JailSnapshot />
         <EuropeCells />
         <OddsCoda />
