@@ -283,3 +283,23 @@
   --color-offence-dui: var(--offence-dui);
   --color-offence-drugs: var(--offence-drugs);
 }
+
+/*
+  Tooltip layer tokens, product-owned (appended product section, never
+  the family sheet above). The shared chart tooltip (src/components/
+  chart-tooltip.tsx) floats over the card it belongs to, so it reuses
+  the theme's popover surface tokens for background and text and only
+  needs its own elevation shadow, kept distinct from the card in both
+  themes.
+*/
+:root {
+  --tooltip-shadow: 0 10px 30px rgb(5 18 20 / 0.16), 0 2px 8px rgb(5 18 20 / 0.12);
+}
+
+.dark {
+  --tooltip-shadow: 0 10px 30px rgb(0 0 0 / 0.55), 0 2px 8px rgb(0 0 0 / 0.45);
+}
+
+@theme inline {
+  --shadow-tooltip: var(--tooltip-shadow);
+}

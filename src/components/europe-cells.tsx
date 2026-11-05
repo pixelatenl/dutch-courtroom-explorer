@@ -1,9 +1,15 @@
 import { FamilySection } from "@/components/family-section";
 import {
+  ChartTooltip,
+  ChartTooltipContainer,
+  type TooltipRow,
+} from "@/components/chart-tooltip";
+import {
   snapshot,
   formatNumber,
   formatPercent,
   formatRate,
+  formatCell,
   nlOccupancy,
 } from "@/data/snapshot";
 
@@ -32,10 +38,27 @@ export function EuropeCells() {
         </>
       }
     >
-      <div className="flex flex-col gap-4">
+      <ChartTooltipContainer className="flex flex-col gap-4">
         <ul className="flex flex-col gap-1.5">
           {rows.map((r) => {
             const isNL = r.country === "NL";
+            const rows_tt: TooltipRow[] = [
+              {
+                label: "Persons held per 100,000",
+                value: formatCell(r.rate, (v) => formatRate(v, 1)),
+              },
+              { label: "Year", value: formatCell(e.year, formatNumber) },
+            ];
+            if (isNL) {
+              rows_tt.push(
+                { label: "Official capacity", value: formatCell(nl.capacity, formatNumber) },
+                { label: "Persons held", value: formatCell(nl.held, formatNumber) },
+                {
+                  label: "Occupancy (derived)",
+                  value: formatCell(nlOccupancy, (v) => formatPercent(v, 1)),
+                },
+              );
+            }
             return (
               <li key={r.country} className="flex items-center gap-3 text-sm">
                 <span className="w-40 shrink-0 truncate text-muted-foreground sm:w-48" title={r.label}>
@@ -47,8 +70,9 @@ export function EuropeCells() {
                   aria-label={`${r.label}: ${formatRate(r.rate, 1)} persons held per 100,000 inhabitants in ${e.year}`}
                   style={{ flexGrow: 1, display: "flex" }}
                 >
-                  <span
-                    className="chart-tooltip-trigger block h-full rounded-sm transition-colors hover:opacity-80"
+                  <ChartTooltip
+                    content={{ title: r.label, rows: rows_tt }}
+                    className="block h-full rounded-sm transition-colors hover:opacity-80"
                     style={{
                       width: `${((r.rate ?? 0) / max) * 100}%`,
                       background: isNL ? "var(--brand-accent)" : "var(--chart-2)",
@@ -57,7 +81,7 @@ export function EuropeCells() {
                     <span className="sr-only">
                       {r.label}: {formatRate(r.rate, 1)} per 100,000
                     </span>
-                  </span>
+                  </ChartTooltip>
                 </span>
                 <span
                   className={`w-16 shrink-0 text-right tabular-nums ${isNL ? "font-semibold text-brand-accent" : "text-muted-foreground"}`}
@@ -91,7 +115,7 @@ export function EuropeCells() {
           </a>{" "}
           ({e.provenance.license}), {e.year}.
         </p>
-      </div>
+      </ChartTooltipContainer>
     </FamilySection>
   );
 }

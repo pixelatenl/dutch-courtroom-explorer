@@ -1,18 +1,23 @@
 import { FamilySection } from "@/components/family-section";
 import { linearScale } from "@/components/chart-utils";
 import {
+  ChartTooltip,
+  ChartTooltipContainer,
+} from "@/components/chart-tooltip";
+import {
   snapshot,
   formatNumber,
   formatPercent,
+  formatCell,
   labelFor,
   SENTENCE_DURATION_LABELS,
-  RESIDENCE_LABELS,
+  LEGAL_STATUS_LABELS,
   STOCK_AGE_LABELS,
 } from "@/data/snapshot";
 
 /*
   The jail snapshot: the 30 September prison stock by sentence
-  duration, 2005 to 2025, as stacked bars, with the residence-status
+  duration, 2005 to 2025, as stacked bars, with the legal-status
   and age composition of the latest year and the DJI cost band. The
   severity proxy (long-sentenced share up, short-sentenced share down)
   is derived at render time from the first and last year.
@@ -73,7 +78,7 @@ export function JailSnapshot() {
 
   const costs = snapshot.costs;
   const stockTotal =
-    stock.byResidenceStatus.find((r) => r.key === "T001557")?.count ?? null;
+    stock.byLegalStatus.find((r) => r.key === "T001557")?.count ?? null;
 
   return (
     <FamilySection
@@ -96,7 +101,7 @@ export function JailSnapshot() {
         </>
       }
     >
-      <div className="flex flex-col gap-5">
+      <ChartTooltipContainer className="flex flex-col gap-5">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           role="img"
@@ -116,21 +121,43 @@ export function JailSnapshot() {
             return (
               <g key={yr.year}>
                 {DURATION_KEYS.map((k) => {
-                  const v = typeof yr[k] === "number" ? (yr[k] as number) : 0;
+                  const raw = yr[k];
+                  const v = typeof raw === "number" ? raw : 0;
                   const y0 = acc;
                   acc += v;
+                  const stockTotal = yr["T001556"];
                   return (
-                    <rect
+                    <ChartTooltip
+                      svg
                       key={k}
-                      className="chart-tooltip-trigger"
-                      x={x(i) - barW / 2}
-                      y={y(acc)}
-                      width={barW}
-                      height={Math.max(0, y(y0) - y(acc))}
-                      fill={`var(--chart-${DURATION_CHART[k]})`}
+                      content={{
+                        title: `${yr.year}: ${labelFor(SENTENCE_DURATION_LABELS, k, k)}`,
+                        rows: [
+                          {
+                            label: "Detainees",
+                            value: formatCell(
+                              typeof raw === "number" ? raw : null,
+                              formatNumber,
+                            ),
+                          },
+                          {
+                            label: "Stock total that year",
+                            value: formatCell(
+                              typeof stockTotal === "number" ? stockTotal : null,
+                              formatNumber,
+                            ),
+                          },
+                        ],
+                      }}
                     >
-                      <title>{`${yr.year}, ${labelFor(SENTENCE_DURATION_LABELS, k, k)}: ${formatNumber(v)}`}</title>
-                    </rect>
+                      <rect
+                        x={x(i) - barW / 2}
+                        y={y(acc)}
+                        width={barW}
+                        height={Math.max(0, y(y0) - y(acc))}
+                        fill={`var(--chart-${DURATION_CHART[k]})`}
+                      />
+                    </ChartTooltip>
                   );
                 })}
               </g>
@@ -153,18 +180,31 @@ export function JailSnapshot() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-            <h3 className="text-sm font-semibold">By residence status, {stock.year}</h3>
+            <h3 className="text-sm font-semibold">By legal status, {stock.year}</h3>
             <ul className="flex flex-col gap-1.5 text-sm">
-              {stock.byResidenceStatus
+              {stock.byLegalStatus
                 .filter((r) => r.key !== "T001557")
                 .map((r) => {
-                  const total = stock.byResidenceStatus.find((x) => x.key === "T001557")?.count;
+                  const total = stock.byLegalStatus.find((x) => x.key === "T001557")?.count;
                   const shareValue = r.count !== null && total ? r.count / total : null;
+                  const label = labelFor(LEGAL_STATUS_LABELS, r.key, r.title);
                   return (
                     <li key={r.key} className="flex items-baseline justify-between gap-3">
-                      <span className="text-muted-foreground">{labelFor(RESIDENCE_LABELS, r.key, r.title)}</span>
+                      <span className="text-muted-foreground">{label}</span>
                       <span className="tabular-nums">
-                        {r.count === null ? "n/a, suppressed" : <>{formatNumber(r.count)} ({formatPercent(shareValue, 1)})</>}
+                        {r.count === null ? (
+                          <ChartTooltip
+                            content={{
+                              title: `${label}, ${stock.year}`,
+                              rows: [{ label: "Detainees", value: "n/a, suppressed" }],
+                              footnote: "Suppressed by CBS (.).",
+                            }}
+                          >
+                            <span>n/a, suppressed</span>
+                          </ChartTooltip>
+                        ) : (
+                          <>{formatNumber(r.count)} ({formatPercent(shareValue, 1)})</>
+                        )}
                       </span>
                     </li>
                   );
@@ -179,11 +219,24 @@ export function JailSnapshot() {
                 .map((r) => {
                   const total = stock.byAge.find((x) => x.key === "10000")?.count;
                   const shareValue = r.count !== null && total ? r.count / total : null;
+                  const label = labelFor(STOCK_AGE_LABELS, r.key, r.title);
                   return (
                     <li key={r.key} className="flex items-baseline justify-between gap-3">
-                      <span className="text-muted-foreground">{labelFor(STOCK_AGE_LABELS, r.key, r.title)}</span>
+                      <span className="text-muted-foreground">{label}</span>
                       <span className="tabular-nums">
-                        {r.count === null ? "n/a, suppressed" : <>{formatNumber(r.count)} ({formatPercent(shareValue, 1)})</>}
+                        {r.count === null ? (
+                          <ChartTooltip
+                            content={{
+                              title: `${label}, ${stock.year}`,
+                              rows: [{ label: "Detainees", value: "n/a, suppressed" }],
+                              footnote: "Suppressed by CBS (.).",
+                            }}
+                          >
+                            <span>n/a, suppressed</span>
+                          </ChartTooltip>
+                        ) : (
+                          <>{formatNumber(r.count)} ({formatPercent(shareValue, 1)})</>
+                        )}
                       </span>
                     </li>
                   );
@@ -218,7 +271,7 @@ export function JailSnapshot() {
             detainees, CBS StatLine table 85841NED.
           </p>
         </div>
-      </div>
+      </ChartTooltipContainer>
     </FamilySection>
   );
 }

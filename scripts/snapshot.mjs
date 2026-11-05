@@ -193,6 +193,41 @@ const SUSPECT_OFFENCES = [
   ["VerdachtenVanDrugsmisdrijven_26", "drugs", "Drug offences"],
 ];
 
+/*
+  Offence subcategories of the group totals, from the same table and
+  the same totals row: no new HTTP source. Children are not additive
+  parts of the group (they overlap and leave a remainder); where a
+  child is itself one of the top-level bars (shoplifting, driving
+  under influence), the bar carries childIncludedIn naming the group
+  or child that already contains it.
+*/
+const SUSPECT_OFFENCE_CHILDREN = {
+  property: [
+    ["DiefstalVerduisteringEnInbraak_3", "theftBurglary", "Theft and burglary"],
+  ],
+  violence: [
+    ["Mishandeling_20", "assault", "Assault"],
+    ["BedreigingEnStalking_21", "threatsStalking", "Threats and stalking"],
+    ["SeksueelMisdrijf_22", "sexualOffences", "Sexual offences"],
+  ],
+  traffic: [
+    ["VerlatenPlaatsOngeval_24", "leavingScene", "Leaving the scene of an accident"],
+    ["RijdenOnderInvloed_25", "dui", "Driving under influence"],
+  ],
+};
+
+const CHILD_INCLUDED_IN = {
+  shoplifting: "theftBurglary",
+  dui: "traffic",
+};
+
+const SUSPECT_OFFENCE_MEASURES = [
+  ...SUSPECT_OFFENCES.map(([m]) => m),
+  ...Object.values(SUSPECT_OFFENCE_CHILDREN)
+    .flat()
+    .map(([m]) => m),
+];
+
 const SEX_TOTAL = "T001038";
 const AGE_TOTAL = "10000";
 const BACKGROUND_TOTAL = "T001040";
@@ -229,7 +264,8 @@ async function fetchSuspects(retrievedAt, info) {
   const byAge = pick(cross, { Geslacht: SEX_TOTAL, Migratieachtergrond: BACKGROUND_TOTAL }, "Leeftijd");
   const byBackground = pick(cross, { Geslacht: SEX_TOTAL, Leeftijd: AGE_TOTAL }, "Migratieachtergrond");
 
-  // Offence composition, all dimensions at their total.
+  // Offence composition, all dimensions at their total: the group
+  // bars plus their subcategory children from the same totals row.
   const offenceRow = await cbsRows("81947NED", {
     filter: [
       `Perioden eq '${latest.key}'`,
@@ -237,13 +273,35 @@ async function fetchSuspects(retrievedAt, info) {
       dimEq('Leeftijd',AGE_TOTAL),
       dimEq('Migratieachtergrond',BACKGROUND_TOTAL),
     ].join(" and "),
-    select: ["Perioden", ...SUSPECT_OFFENCES.map(([m]) => m)],
+    select: ["Perioden", ...SUSPECT_OFFENCE_MEASURES],
   });
   const byOffence = SUSPECT_OFFENCES.map(([measure, key, label]) => ({
     key,
     label,
     count: offenceRow[0]?.[measure] ?? null,
   }));
+  const childLabels = new Map(
+    Object.values(SUSPECT_OFFENCE_CHILDREN)
+      .flat()
+      .map(([, key, label]) => [key, label]),
+  );
+  for (const [measure, key, label] of SUSPECT_OFFENCES) {
+    childLabels.set(key, label);
+  }
+  for (const row of byOffence) {
+    const children = SUSPECT_OFFENCE_CHILDREN[row.key];
+    if (children) {
+      row.children = children.map(([measure, key, label]) => ({
+        key,
+        label,
+        count: offenceRow[0]?.[measure] ?? null,
+      }));
+    }
+    const includedIn = CHILD_INCLUDED_IN[row.key];
+    if (includedIn) {
+      row.childIncludedIn = { key: includedIn, label: childLabels.get(includedIn) ?? includedIn };
+    }
+  }
 
   const dims = {
     Geslacht: await cbsDimension("81947NED", "Geslacht"),
@@ -567,7 +625,7 @@ async function fetchPrisonStock(retrievedAt, info) {
     dimEq('Leeftijd',AGE_TOTAL),
     dimEq('Misdrijven','T001312'),
   ];
-  const residenceRows = await cbsRows("85841NED", {
+  const legalStatusRows = await cbsRows("85841NED", {
     filter: [...latestBase, dimEq('Strafduur','T001556')].join(" and "),
     select: ["Verblijfstitel", "GedetineerdenOp30September_1"],
   });
@@ -581,7 +639,7 @@ async function fetchPrisonStock(retrievedAt, info) {
     ].join(" and "),
     select: ["Leeftijd", "GedetineerdenOp30September_1"],
   });
-  const residenceDims = await cbsDimension("85841NED", "Verblijfstitel");
+  const legalStatusDims = await cbsDimension("85841NED", "Verblijfstitel");
   const ageDims = await cbsDimension("85841NED", "Leeftijd");
   const mapRows = (rows, dim, dims) =>
     rows.map((r) => ({
@@ -594,7 +652,7 @@ async function fetchPrisonStock(retrievedAt, info) {
     provenance: cbsProvenance("85841NED", retrievedAt, info),
     years: Object.values(bySentenceDuration).sort((a, b) => a.year - b.year),
     year: yearOf(latest.key),
-    byResidenceStatus: mapRows(residenceRows, "Verblijfstitel", residenceDims),
+    byLegalStatus: mapRows(legalStatusRows, "Verblijfstitel", legalStatusDims),
     byAge: mapRows(ageRows, "Leeftijd", ageDims),
     sentenceDurationKeys: SENTENCE_DURATION_KEYS,
   };

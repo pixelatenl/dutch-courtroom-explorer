@@ -63,10 +63,20 @@ export interface RateRow {
   per10000: number | null;
 }
 
+export interface OffenceChild {
+  key: string;
+  label: string;
+  count: number | null;
+}
+
 export interface OffenceRow {
   key: string;
   label: string;
   count: number | null;
+  /** Subcategories of this group, fetched from the same CBS totals row. */
+  children?: OffenceChild[];
+  /** Set when this bar is itself contained in another group or child. */
+  childIncludedIn?: { key: string; label: string };
 }
 
 export interface JusticeYear {
@@ -169,7 +179,7 @@ export interface Snapshot {
     provenance: Provenance;
     years: PrisonStockYear[];
     year: number;
-    byResidenceStatus: KeyedCount[];
+    byLegalStatus: KeyedCount[];
     byAge: KeyedCount[];
     sentenceDurationKeys: string[];
   };
@@ -220,6 +230,19 @@ export function formatPercent(value: number | null | undefined, digits = 0): str
 export function formatRate(value: number | null | undefined, digits = 1): string {
   if (value === null || value === undefined) return "n/a";
   return value.toFixed(digits);
+}
+
+/*
+  Formatter for a possibly-suppressed CBS cell in a tooltip or label:
+  null stays null and renders as "n/a, suppressed", never as zero and
+  never as an empty string.
+*/
+export function formatCell(
+  value: number | null | undefined,
+  format: (v: number) => string,
+): string {
+  if (value === null || value === undefined) return "n/a, suppressed";
+  return format(value);
 }
 
 /** "1 in N" from a per-capita rate: rate per `per` inhabitants. */
@@ -301,7 +324,7 @@ export const PREVIOUS_DETENTION_LABELS: Record<string, string> = {
   A052583: "Not previously detained",
 };
 
-export const RESIDENCE_LABELS: Record<string, string> = {
+export const LEGAL_STATUS_LABELS: Record<string, string> = {
   T001557: "Total",
   A048446: "Preliminary detention",
   A048447: "Prison sentence",
@@ -433,6 +456,40 @@ export const clearanceSeries = crimeYears.map((y) => ({
 }));
 
 /*
+  Offence subcategory breakdown of a dock-chart group, derived at
+  render time. Children overlap and do not sum to the group total, so
+  the remainder (group total minus the sum of the published children)
+  is computed here and labeled derived by the renderer; a child that
+  is itself a top-level bar (shoplifting, driving under influence) is
+  flagged through its childIncludedIn note and never added on top.
+*/
+export interface OffenceBreakdownRow {
+  child: OffenceChild;
+  shareOfGroup: number | null;
+}
+
+export function offenceBreakdown(group: OffenceRow): {
+  rows: OffenceBreakdownRow[];
+  remainder: number | null;
+} {
+  const children = group.children ?? [];
+  const groupCount = group.count;
+  const rows = children.map((child) => ({
+    child,
+    shareOfGroup:
+      child.count !== null && groupCount !== null && groupCount > 0
+        ? child.count / groupCount
+        : null,
+  }));
+  const remainder =
+    groupCount !== null
+      ? groupCount -
+        children.reduce((sum, c) => sum + (c.count ?? 0), 0)
+      : null;
+  return { rows, remainder };
+}
+
+/*
   The absorption funnel: of every 100 registered crimes in the latest
   justice year, how many end in a suspect registration, a summons, a
   conviction, and a prison term. Each stage is divided by the same
@@ -452,13 +509,22 @@ export const funnel = (() => {
       ? null
       : (latestJustice.guiltyWithSanction ?? 0) +
         (latestJustice.guiltyWithoutSanction ?? 0);
+  const absolute = {
+    suspect: crimes?.suspectRegistrations ?? null,
+    summons: latestJustice.summons,
+    conviction,
+    prison: latestJustice.prison,
+  };
   return {
     year: latestJustice.year,
     per100Crimes: denominator,
-    suspect: stage(crimes?.suspectRegistrations ?? null),
-    summons: stage(latestJustice.summons),
-    conviction: stage(conviction),
-    prison: stage(latestJustice.prison),
+    suspect: stage(absolute.suspect),
+    summons: stage(absolute.summons),
+    conviction: stage(absolute.conviction),
+    prison: stage(absolute.prison),
+    // Absolute stage counts behind the derived per-100 values, for the
+    // chart tooltips.
+    absolute,
   };
 })();
 
@@ -503,7 +569,7 @@ export const nlOccupancy =
 /** Annual cost of holding the current 30 September stock (derived). */
 export const annualStockCost =
   (() => {
-    const total = snapshot.prisonStock.byResidenceStatus.find(
+    const total = snapshot.prisonStock.byLegalStatus.find(
       (r) => r.key === "T001557",
     )?.count;
     const perDay = snapshot.costs.costPerDetaineePerDayEur.regular;
