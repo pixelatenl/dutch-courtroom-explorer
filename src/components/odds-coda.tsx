@@ -25,7 +25,7 @@ export function OddsCoda() {
   const perDay = s.costs.costPerDetaineePerDayEur.regular;
   const perYear = s.costs.costPerDetaineePerYearEur.regular;
   const stockTotal =
-    s.prisonStock.byResidenceStatus.find((r) => r.key === "T001557")?.count ??
+    s.prisonStock.byLegalStatus.find((r) => r.key === "T001557")?.count ??
     null;
 
   return (

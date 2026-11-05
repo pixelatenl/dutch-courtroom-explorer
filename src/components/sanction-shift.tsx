@@ -1,11 +1,16 @@
 import { FamilySection } from "@/components/family-section";
 import { linearScale } from "@/components/chart-utils";
 import {
+  ChartTooltip,
+  ChartTooltipContainer,
+} from "@/components/chart-tooltip";
+import {
   justiceYears,
   firstJustice,
   latestJustice,
   formatNumber,
   formatPercent,
+  formatCell,
 } from "@/data/snapshot";
 
 /*
@@ -50,7 +55,7 @@ export function SanctionShift() {
         </>
       }
     >
-      <div className="flex flex-col gap-4">
+      <ChartTooltipContainer className="flex flex-col gap-4">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           role="img"
@@ -85,21 +90,40 @@ export function SanctionShift() {
             return (
               <g key={yr.year}>
                 {SERIES.map((s) => {
-                  const share = (yr[s.field] ?? 0) / (t || 1);
+                  const count = yr[s.field];
+                  const share = count !== null && t > 0 ? count / t : null;
                   const y0 = acc;
-                  acc += share;
+                  acc += (count ?? 0) / (t || 1);
                   return (
-                    <rect
+                    <ChartTooltip
+                      svg
                       key={s.key}
-                      className="chart-tooltip-trigger"
-                      x={x(i) - barW / 2}
-                      y={M.top + ih - acc * ih}
-                      width={barW}
-                      height={Math.max(0, share * ih)}
-                      fill={`var(--chart-${s.chart})`}
+                      content={{
+                        title: `${yr.year}: ${s.label}`,
+                        rows: [
+                          {
+                            label: "Share of sanctions",
+                            value: formatCell(share, (v) => formatPercent(v, 1)),
+                          },
+                          {
+                            label: "Sanctions",
+                            value: formatCell(count, formatNumber),
+                          },
+                          {
+                            label: "Total sanctions that year",
+                            value: formatCell(yr.sanctionsTotal, formatNumber),
+                          },
+                        ],
+                      }}
                     >
-                      <title>{`${yr.year}, ${s.label}: ${formatPercent(share, 1)} (${formatNumber(yr[s.field])})`}</title>
-                    </rect>
+                      <rect
+                        x={x(i) - barW / 2}
+                        y={M.top + ih - acc * ih}
+                        width={barW}
+                        height={Math.max(0, ((count ?? 0) / (t || 1)) * ih)}
+                        fill={`var(--chart-${s.chart})`}
+                      />
+                    </ChartTooltip>
                   );
                 })}
               </g>
@@ -135,7 +159,7 @@ export function SanctionShift() {
           Share of all imposed sanctions per year, CBS StatLine table 83944NED
           (opgelegde sancties, hoofdstraffen).
         </p>
-      </div>
+      </ChartTooltipContainer>
     </FamilySection>
   );
 }

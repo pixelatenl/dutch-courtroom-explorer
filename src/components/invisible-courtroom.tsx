@@ -1,11 +1,16 @@
 import { FamilySection } from "@/components/family-section";
 import { linearScale } from "@/components/chart-utils";
 import {
+  ChartTooltip,
+  ChartTooltipContainer,
+} from "@/components/chart-tooltip";
+import {
   justiceYears,
   firstJustice,
   latestJustice,
   formatNumber,
   formatPercent,
+  formatCell,
 } from "@/data/snapshot";
 
 /*
@@ -58,7 +63,7 @@ export function InvisibleCourtroom() {
         </>
       }
     >
-      <div className="flex flex-col gap-4">
+      <ChartTooltipContainer className="flex flex-col gap-4">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           role="img"
@@ -98,21 +103,44 @@ export function InvisibleCourtroom() {
             });
             return (
               <g key={yr.year}>
-                {segments.map((s) => (
-                  <rect
-                    key={s.key}
-                    className="chart-tooltip-trigger"
-                    x={x(i) - barW / 2}
-                    y={M.top + ih - s.y1 * ih}
-                    width={barW}
-                    height={Math.max(0, (s.y1 - s.y0) * ih)}
-                    fill={
-                      s.accent ? "var(--brand-accent)" : `var(--chart-${s.chart})`
-                    }
-                  >
-                    <title>{`${yr.year}, ${s.label}: ${formatPercent(s.y1 - s.y0, 1)} of decisions (${formatNumber(yr[s.field])})`}</title>
-                  </rect>
-                ))}
+                {segments.map((s) => {
+                  const count = yr[s.field];
+                  const share =
+                    count !== null && total > 0 ? count / total : null;
+                  return (
+                    <ChartTooltip
+                      svg
+                      key={s.key}
+                      content={{
+                        title: `${yr.year}: ${s.label}`,
+                        rows: [
+                          {
+                            label: "Share of decisions",
+                            value: formatCell(share, (v) => formatPercent(v, 1)),
+                          },
+                          {
+                            label: "Decisions",
+                            value: formatCell(count, formatNumber),
+                          },
+                          {
+                            label: "Total decisions that year",
+                            value: formatCell(yr.omTotal, formatNumber),
+                          },
+                        ],
+                      }}
+                    >
+                      <rect
+                        x={x(i) - barW / 2}
+                        y={M.top + ih - s.y1 * ih}
+                        width={barW}
+                        height={Math.max(0, (s.y1 - s.y0) * ih)}
+                        fill={
+                          s.accent ? "var(--brand-accent)" : `var(--chart-${s.chart})`
+                        }
+                      />
+                    </ChartTooltip>
+                  );
+                })}
               </g>
             );
           })}
@@ -162,7 +190,7 @@ export function InvisibleCourtroom() {
           {formatNumber(latestJustice.verdictTotal)} verdicts in{" "}
           {latestJustice.year}.
         </p>
-      </div>
+      </ChartTooltipContainer>
     </FamilySection>
   );
 }

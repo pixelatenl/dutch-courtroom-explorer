@@ -1,10 +1,15 @@
 import { FamilySection } from "@/components/family-section";
 import { areaPath, linearScale, linePath, niceTicks } from "@/components/chart-utils";
 import {
+  ChartTooltip,
+  ChartTooltipContainer,
+} from "@/components/chart-tooltip";
+import {
   clearanceSeries,
   crimeYears,
   formatPercent,
   formatRate,
+  formatCell,
   latestCrime,
 } from "@/data/snapshot";
 
@@ -87,7 +92,7 @@ export function ClearanceParadox() {
         </>
       }
     >
-      <div className="flex flex-col gap-4">
+      <ChartTooltipContainer className="flex flex-col gap-4">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           role="img"
@@ -132,20 +137,52 @@ export function ClearanceParadox() {
             (p, i) =>
               p.y !== null &&
               clearanceSeries[i].year % 10 === 0 && (
-                <circle key={`c${i}`} cx={p.x} cy={p.y} r="3" fill="var(--chart-1)" stroke="var(--card)" strokeWidth="1.5">
-                  <title>{`${clearanceSeries[i].year}: ${formatRate(clearanceSeries[i].crimeRate, 1)} crimes per 1,000`}</title>
-                </circle>
+                <circle key={`c${i}`} cx={p.x} cy={p.y} r="3" fill="var(--chart-1)" stroke="var(--card)" strokeWidth="1.5" />
               ),
           )}
           {clearPoints.map(
             (p, i) =>
               p.y !== null &&
               clearanceSeries[i].year % 10 === 0 && (
-                <rect key={`r${i}`} x={p.x - 3} y={p.y - 3} width="6" height="6" fill="var(--brand-accent)" stroke="var(--card)" strokeWidth="1.5" transform={`rotate(45 ${p.x} ${p.y})`}>
-                  <title>{`${clearanceSeries[i].year}: ${formatPercent(clearanceSeries[i].clearanceRate, 1)} solved`}</title>
-                </rect>
+                <rect key={`r${i}`} x={p.x - 3} y={p.y - 3} width="6" height="6" fill="var(--brand-accent)" stroke="var(--card)" strokeWidth="1.5" transform={`rotate(45 ${p.x} ${p.y})`} />
               ),
           )}
+          {/* One invisible full-height band per year: every year is
+              hoverable and focusable, not only the decade markers. */}
+          {clearanceSeries.map((s) => {
+            const bandW = iw / (last.year - first.year);
+            const bx = Math.max(M.left, x(s.year) - bandW / 2);
+            const bw = Math.min(bandW, M.left + iw - bx);
+            return (
+              <ChartTooltip
+                svg
+                key={s.year}
+                content={{
+                  title: `${s.year}`,
+                  rows: [
+                    {
+                      label: "Crimes per 1,000 inhabitants",
+                      value: formatCell(s.crimeRate, (v) => formatRate(v, 1)),
+                    },
+                    {
+                      label: "Solved share",
+                      value: formatCell(s.clearanceRate, (v) =>
+                        formatPercent(v, 1),
+                      ),
+                    },
+                  ],
+                }}
+              >
+                <rect
+                  x={bx}
+                  y={M.top}
+                  width={bw}
+                  height={ih}
+                  fill="transparent"
+                />
+              </ChartTooltip>
+            );
+          })}
         </svg>
         <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <li className="inline-flex items-center gap-1.5">
@@ -161,7 +198,7 @@ export function ClearanceParadox() {
           CBS StatLine table 83723NED: misdrijven per 1,000 inwoners and
           opgehelderde misdrijven relatief. Suppressed years render as gaps.
         </p>
-      </div>
+      </ChartTooltipContainer>
     </FamilySection>
   );
 }

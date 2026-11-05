@@ -2,6 +2,10 @@ import { FamilySection } from "@/components/family-section";
 import { StatusChip } from "@/components/status-chip";
 import { areaPath, linearScale, linePath, niceTicks } from "@/components/chart-utils";
 import {
+  ChartTooltip,
+  ChartTooltipContainer,
+} from "@/components/chart-tooltip";
+import {
   snapshot,
   crimeYears,
   crimeRateSeries,
@@ -11,6 +15,8 @@ import {
   statusChip,
   formatRate,
   formatNumber,
+  formatPercent,
+  formatCell,
 } from "@/data/snapshot";
 
 /*
@@ -57,7 +63,7 @@ export function VanishingCrime() {
         </>
       }
     >
-      <div className="flex flex-col gap-4">
+      <ChartTooltipContainer className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2">
           <StatusChip chip={totalChip} invert />
           {chips.map((c) => (
@@ -142,17 +148,55 @@ export function VanishingCrime() {
                   fill="var(--chart-1)"
                   stroke="var(--card)"
                   strokeWidth="1.5"
-                >
-                  <title>{`${crimeRateSeries[i].year}: ${formatRate(crimeRateSeries[i].value, 1)} per 1,000`}</title>
-                </circle>
+                />
               ),
           )}
+          {/* One invisible full-height band per year: every year is
+              hoverable and focusable, not only the decade dots. */}
+          {crimeYears.map((cy) => {
+            const bandW = iw / (last.year - first.year);
+            const bx = Math.max(M.left, x(cy.year) - bandW / 2);
+            const bw = Math.min(bandW, M.left + iw - bx);
+            return (
+              <ChartTooltip
+                svg
+                key={cy.year}
+                content={{
+                  title: `${cy.year}`,
+                  rows: [
+                    {
+                      label: "Crimes per 1,000 inhabitants",
+                      value: formatCell(cy.totalPer1000, (v) => formatRate(v, 1)),
+                    },
+                    {
+                      label: "Registered crimes",
+                      value: formatCell(cy.total, formatNumber),
+                    },
+                    {
+                      label: "Solved share",
+                      value: formatCell(cy.clearanceRate, (v) =>
+                        formatPercent(v / 100, 1),
+                      ),
+                    },
+                  ],
+                }}
+              >
+                <rect
+                  x={bx}
+                  y={M.top}
+                  width={bw}
+                  height={ih}
+                  fill="transparent"
+                />
+              </ChartTooltip>
+            );
+          })}
         </svg>
         <p className="text-sm text-muted-foreground">
           Per 1,000 inhabitants, CBS StatLine table{" "}
           {snapshotTable("83723NED")}. Suppressed years render as gaps.
         </p>
-      </div>
+      </ChartTooltipContainer>
     </FamilySection>
   );
 }

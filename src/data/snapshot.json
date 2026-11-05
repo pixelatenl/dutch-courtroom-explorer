@@ -1945,27 +1945,71 @@
       {
         "key": "property",
         "label": "Property offences",
-        "count": 54030
+        "count": 54030,
+        "children": [
+          {
+            "key": "theftBurglary",
+            "label": "Theft and burglary",
+            "count": 43900
+          }
+        ]
       },
       {
         "key": "shoplifting",
         "label": "Shoplifting",
-        "count": 28120
+        "count": 28120,
+        "childIncludedIn": {
+          "key": "theftBurglary",
+          "label": "Theft and burglary"
+        }
       },
       {
         "key": "violence",
         "label": "Violence",
-        "count": 35500
+        "count": 35500,
+        "children": [
+          {
+            "key": "assault",
+            "label": "Assault",
+            "count": 21920
+          },
+          {
+            "key": "threatsStalking",
+            "label": "Threats and stalking",
+            "count": 10520
+          },
+          {
+            "key": "sexualOffences",
+            "label": "Sexual offences",
+            "count": 3040
+          }
+        ]
       },
       {
         "key": "traffic",
         "label": "Traffic offences",
-        "count": 48420
+        "count": 48420,
+        "children": [
+          {
+            "key": "leavingScene",
+            "label": "Leaving the scene of an accident",
+            "count": 3230
+          },
+          {
+            "key": "dui",
+            "label": "Driving under influence",
+            "count": 37650
+          }
+        ]
       },
       {
         "key": "dui",
         "label": "Driving under influence",
-        "count": 37650
+        "count": 37650,
+        "childIncludedIn": {
+          "key": "traffic",
+          "label": "Traffic offences"
+        }
       },
       {
         "key": "drugs",
@@ -3350,7 +3394,7 @@
       }
     ],
     "year": 2025,
-    "byResidenceStatus": [
+    "byLegalStatus": [
       {
         "key": "T001557",
         "title": "Totaal",

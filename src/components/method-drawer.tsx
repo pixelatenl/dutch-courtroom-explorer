@@ -50,7 +50,9 @@ export function MethodDrawer() {
             values (per-year costs, per-100 funnel stages, occupancy,
             probabilities) are computed at render time from snapshot fields
             and flagged as derived; derived status chips are computed from the
-            snapshot series, never hand-written.
+            snapshot series, never hand-written. Tooltips repeat figures
+            already sourced and linked on the card; they introduce no new
+            sources.
           </p>
         </section>
 

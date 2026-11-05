@@ -1,7 +1,12 @@
 import { FamilySection } from "@/components/family-section";
 import {
+  ChartTooltip,
+  ChartTooltipContainer,
+} from "@/components/chart-tooltip";
+import {
   funnel,
   formatNumber,
+  formatCell,
 } from "@/data/snapshot";
 
 /*
@@ -58,10 +63,12 @@ export function AbsorptionFunnel() {
         </>
       }
     >
-      <div className="flex flex-col gap-5">
+      <ChartTooltipContainer className="flex flex-col gap-5">
         {STAGES.map((s) => {
           const value =
             funnel[s.key as keyof typeof funnel] as number | null;
+          const absolute =
+            funnel.absolute[s.key as keyof typeof funnel.absolute] ?? null;
           const widthPct = value === null ? 0 : (value / max) * 100;
           return (
             <div key={s.key} className="flex flex-col gap-1.5">
@@ -86,15 +93,33 @@ export function AbsorptionFunnel() {
                 aria-label={`${s.label}: ${value === null ? "suppressed" : `${formatNumber(value)} per 100 registered crimes in ${funnel.year}`}`}
               >
                 {value !== null && (
-                  <div
-                    className="chart-tooltip-trigger h-full rounded-md transition-colors hover:opacity-80"
+                  <ChartTooltip
+                    content={{
+                      title: `${s.label}, ${funnel.year}`,
+                      rows: [
+                        {
+                          label: "Per 100 registered crimes",
+                          value: formatCell(value, formatNumber),
+                        },
+                        {
+                          label: `${s.label} (absolute)`,
+                          value: formatCell(absolute, formatNumber),
+                        },
+                        {
+                          label: "Registered crimes (denominator)",
+                          value: formatCell(funnel.per100Crimes, formatNumber),
+                        },
+                      ],
+                      footnote: `The per-100 value is derived: the stage's absolute count divided by the ${formatNumber(funnel.per100Crimes)} registered crimes of ${funnel.year}.`,
+                    }}
+                    className="block h-full rounded-md transition-colors hover:opacity-80"
                     style={{
                       width: `${widthPct}%`,
                       background: s.token,
                     }}
                   >
                     <span className="sr-only">{s.sentence(value)}</span>
-                  </div>
+                  </ChartTooltip>
                 )}
               </div>
               <p className="text-sm text-muted-foreground">
@@ -107,7 +132,7 @@ export function AbsorptionFunnel() {
             </div>
           );
         })}
-      </div>
+      </ChartTooltipContainer>
     </FamilySection>
   );
 }
