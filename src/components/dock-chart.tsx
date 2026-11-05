@@ -30,6 +30,7 @@ const TOKEN: Record<string, string> = {
   traffic: "var(--offence-traffic)",
   dui: "var(--offence-dui)",
   drugs: "var(--offence-drugs)",
+  sexualOffences: "var(--offence-sexual)",
 };
 
 /** Tooltip payload for one offence bar, derived from the snapshot. */

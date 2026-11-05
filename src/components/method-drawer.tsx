@@ -169,12 +169,20 @@ export function MethodDrawer() {
         <section>
           <h3 className="font-semibold text-foreground">Colour audit</h3>
           <p className="mt-1">
-            The justice categorical tokens (four funnel stages, six offence
+            The justice categorical tokens (four funnel stages, seven offence
             categories, seven stacked-segment tokens) are defined per theme in
             app/globals.css. Every token clears 3 to 1 against both surfaces
             of its theme (page and card, light and dark), and every adjacent
             pair of tokens clears 3 to 1 against each other; the full ratio
-            table is documented in the stylesheet comment. The stacked-segment
+            table is documented in the stylesheet comment. The offence group
+            (--offence-*, seven dock bars) audits at 13.0-13.6 and 3.8-4.0
+            against the light page (13.7-14.4 and 4.0-4.2 against the light
+            card) with neighbours 3.28-3.58, and at 11.4-11.8 and 3.6-3.7
+            against the dark page (9.6-10.0 and 3.0-3.1 against the dark
+            card) with neighbours 3.18-3.26; the newest token,
+            --offence-sexual (light #510c30, dark #fceff6), clears 13.2/13.9
+            in light and 11.8/10.0 in dark against page/card and 3.48/3.23
+            against its dock neighbour (drugs). The stacked-segment
             group (--stack-1..7) audits at 13.5-13.6 and 4.1-4.4 against the
             light page (14.2-14.3 and 4.3-4.4 against the light card) with
             neighbours 3.26-3.30, and at 12.0-12.1 and 3.7 against the dark
