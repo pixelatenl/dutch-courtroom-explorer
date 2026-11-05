@@ -13,6 +13,10 @@
   elsewhere or a scroll dismisses. The tooltip itself is aria-hidden
   and pointer-events-none; screen readers keep getting the values
   through the chart's role="img" aria-label and the sr-only text.
+
+  Line and area charts pass `crosshair` to their band triggers: while
+  the tooltip is open, a vertical guide line snaps to the hovered
+  year's x across the plot area, with marker dots on the series.
 */
 
 import {
@@ -85,6 +89,7 @@ interface Placement {
 export function ChartTooltip({
   content,
   svg = false,
+  crosshair,
   className,
   style,
   children,
@@ -93,6 +98,15 @@ export function ChartTooltip({
   content: TooltipContent;
   /** Wrap an SVG shape instead of an HTML element. */
   svg?: boolean;
+  /*
+    Opt-in vertical guide line for line and area charts (SVG triggers
+    only): while the tooltip is open, a line is drawn at the trigger's
+    center x across the trigger's full height, with optional marker
+    dots on the series. Pass true to use the trigger's own box, or an
+    object to override the line x and supply markers, all in local
+    (viewBox) coordinates.
+  */
+  crosshair?: boolean | { x?: number; markers?: { y: number; fill: string }[] };
   className?: string;
   style?: React.CSSProperties;
   children?: ReactNode;
@@ -102,6 +116,11 @@ export function ChartTooltip({
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState<Placement | null>(null);
+  const [crosshairGeom, setCrosshairGeom] = useState<{
+    cx: number;
+    y0: number;
+    y1: number;
+  } | null>(null);
 
   const computePlacement = useCallback(() => {
     const trigger = triggerRef.current;
@@ -149,13 +168,34 @@ export function ChartTooltip({
   }, [ctx]);
 
   // Position once on open and on resize while open; the tooltip is
-  // absolutely positioned, so hovering causes no layout work.
+  // absolutely positioned, so hovering causes no layout work. The
+  // crosshair geometry comes from the trigger shape's own box in local
+  // (viewBox) coordinates, read before the guide line itself renders.
   useIsomorphicLayoutEffect(() => {
     if (!open) return;
     computePlacement();
+    if (svg && crosshair) {
+      const el = triggerRef.current;
+      const shape =
+        el && el.firstElementChild instanceof SVGGraphicsElement
+          ? el.firstElementChild
+          : el;
+      if (shape instanceof SVGGraphicsElement) {
+        try {
+          const b = shape.getBBox();
+          setCrosshairGeom({
+            cx: b.x + b.width / 2,
+            y0: b.y,
+            y1: b.y + b.height,
+          });
+        } catch {
+          setCrosshairGeom(null);
+        }
+      }
+    }
     window.addEventListener("resize", computePlacement);
     return () => window.removeEventListener("resize", computePlacement);
-  }, [open, computePlacement]);
+  }, [open, computePlacement, svg, crosshair]);
 
   // Dismissal while open: Escape, a pointer down outside the trigger,
   // or any scroll. Focus is never moved, so the trigger keeps it.
@@ -257,6 +297,11 @@ export function ChartTooltip({
     : null;
 
   if (svg) {
+    const markers = typeof crosshair === "object" ? (crosshair.markers ?? []) : [];
+    const lineX =
+      (typeof crosshair === "object" && crosshair.x !== undefined
+        ? crosshair.x
+        : crosshairGeom?.cx) ?? 0;
     return (
       <g
         ref={triggerRef as React.Ref<SVGGElement>}
@@ -266,6 +311,29 @@ export function ChartTooltip({
         {...handlers}
       >
         {children}
+        {open && crosshair && crosshairGeom && (
+          <g aria-hidden="true" style={{ pointerEvents: "none" }}>
+            <line
+              x1={lineX}
+              x2={lineX}
+              y1={crosshairGeom.y0}
+              y2={crosshairGeom.y1}
+              stroke="var(--ring)"
+              strokeWidth={1}
+            />
+            {markers.map((m, i) => (
+              <circle
+                key={i}
+                cx={lineX}
+                cy={m.y}
+                r={4}
+                fill={m.fill}
+                stroke="var(--card)"
+                strokeWidth={1.5}
+              />
+            ))}
+          </g>
+        )}
         {tooltip}
       </g>
     );

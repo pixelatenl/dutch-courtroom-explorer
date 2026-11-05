@@ -157,6 +157,16 @@ export function ClearanceParadox() {
               <ChartTooltip
                 svg
                 key={s.year}
+                crosshair={{
+                  markers: [
+                    ...(s.crimeRate !== null
+                      ? [{ y: yCrime(s.crimeRate), fill: "var(--chart-1)" }]
+                      : []),
+                    ...(s.clearanceRate !== null
+                      ? [{ y: yClear(s.clearanceRate), fill: "var(--brand-accent)" }]
+                      : []),
+                  ],
+                }}
                 content={{
                   title: `${s.year}`,
                   rows: [
