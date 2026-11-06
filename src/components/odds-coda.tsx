@@ -17,7 +17,8 @@ import {
   Every figure is a snapshot value or a render-time derivation: the odds
   come from oneIn over the snapshot rates, the percentages from the same
   rates over the same denominators, the bill from the DJI per-day figure
-  and the existing annualStockCost export. The only numeric literals are
+  and the existing annualStockCost export (shown compact, "1.5 billion",
+  so all five stat values share one size). The only numeric literals are
   the unit denominators of oneIn/formatPercent, the formatter digit
   arguments, and the calendar 365 in the derivation phrases. A suppressed
   (null) rate stays "n/a" everywhere, never zero.
@@ -46,6 +47,21 @@ export function OddsCoda() {
   const percentSuspect = percentOf(suspectRate, 10000, 2);
   const percentPrison = percentOf(prisonRate, 100000, 3);
   const percentVictim = percentOf(victimRate, 1000000, 5);
+
+  /*
+    Compact money form for the coda's big bill: the snapshot value in
+    en-GB long compact notation ("1.5 billion"), so the punchline can
+    share the stat row's font size; the exact figure stays in the copy
+    above. Only the digit argument is a literal. Null stays n/a.
+  */
+  const formatCompactMoney = (value: number | null) =>
+    value === null
+      ? "n/a"
+      : `€${new Intl.NumberFormat("en-GB", {
+          notation: "compact",
+          compactDisplay: "long",
+          maximumFractionDigits: 1,
+        }).format(value)}`;
 
   return (
     <section>
@@ -92,7 +108,7 @@ export function OddsCoda() {
           </p>
           <div className="grid grid-cols-2 gap-x-10 gap-y-6 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-14 lg:gap-y-0">
             <div>
-              <p className="text-3xl font-bold tabular-nums text-foreground">
+              <p className="text-xl font-bold tabular-nums text-foreground md:text-2xl">
                 {oneIn(suspectRate, 10000)}
               </p>
               <p className="mt-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
@@ -103,7 +119,7 @@ export function OddsCoda() {
               </p>
             </div>
             <div>
-              <p className="text-2xl font-bold tabular-nums text-foreground">
+              <p className="text-xl font-bold tabular-nums text-foreground md:text-2xl">
                 {oneIn(prisonRate, 100000)}
               </p>
               <p className="mt-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
@@ -114,7 +130,7 @@ export function OddsCoda() {
               </p>
             </div>
             <div>
-              <p className="text-xl font-bold tabular-nums text-foreground">
+              <p className="text-xl font-bold tabular-nums text-foreground md:text-2xl">
                 {oneIn(victimRate, 1000000)}
               </p>
               <p className="mt-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
@@ -126,7 +142,7 @@ export function OddsCoda() {
               </p>
             </div>
             <div>
-              <p className="text-2xl font-bold tabular-nums text-brand-accent">
+              <p className="text-xl font-bold tabular-nums text-brand-accent md:text-2xl">
                 {`€${formatNumber(perYear)}`}
               </p>
               <p className="mt-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
@@ -137,8 +153,8 @@ export function OddsCoda() {
               </p>
             </div>
             <div className="col-span-2 lg:col-span-1">
-              <p className="text-3xl font-bold tabular-nums text-brand-accent sm:text-4xl lg:text-[clamp(0.875rem,1.45vw,1.25rem)]">
-                {`€${formatNumber(annualStockCost)}`}
+              <p className="text-xl font-bold tabular-nums text-brand-accent md:text-2xl">
+                {formatCompactMoney(annualStockCost)}
               </p>
               <p className="mt-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
                 Everyone inside, one year
