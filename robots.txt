@@ -1,0 +1,4 @@
+User-Agent: *
+Allow: /
+
+Sitemap: https://justice.pixelate.nl/sitemap.xml
