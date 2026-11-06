@@ -430,6 +430,12 @@ function CatchViewProvider({ children }: { children: React.ReactNode }) {
 /* The cards                                                           */
 /* ------------------------------------------------------------------ */
 
+/*
+  The Background and generation card is kept in code but hidden from
+  the UI for now; flip this flag to show it again.
+*/
+const SHOW_BACKGROUND_CARD = false;
+
 function CardsGrid() {
   const view = useContext(CatchViewContext);
   const s = snapshot;
@@ -560,29 +566,31 @@ function CardsGrid() {
       >
         <RateBars config={OWN_POPULATION} blocks={[{ rows: sexRows }]} />
       </Card>
-      <Card
-        title="Background and generation"
-        year={s.backgroundGeneration.year}
-        note={`Migration background as registered by CBS; generation split among people with a migration background. The generation split does not reconcile exactly with the migration-background total as published: ${formatNumber(generationSum)} against ${formatNumber(migrationCount)}, a derived difference of ${formatNumber(generationDiff)}. Each rate is per 10,000 within the group's own population, so a group rate is a weighted average of its subgroup rates, never their sum. CBS counts include suspects who are not in the municipal population register (GBA) while the rates do not, so counts and rates do not reconstruct each other exactly.`}
-      >
-        {view === "share" ? (
-          <RateBars
-            config={OWN_POPULATION}
-            blocks={backgroundCompositionBlocks}
-          />
-        ) : (
-          <div className="flex flex-col gap-4">
+      {SHOW_BACKGROUND_CARD && (
+        <Card
+          title="Background and generation"
+          year={s.backgroundGeneration.year}
+          note={`Migration background as registered by CBS; generation split among people with a migration background. The generation split does not reconcile exactly with the migration-background total as published: ${formatNumber(generationSum)} against ${formatNumber(migrationCount)}, a derived difference of ${formatNumber(generationDiff)}. Each rate is per 10,000 within the group's own population, so a group rate is a weighted average of its subgroup rates, never their sum. CBS counts include suspects who are not in the municipal population register (GBA) while the rates do not, so counts and rates do not reconstruct each other exactly.`}
+        >
+          {view === "share" ? (
             <RateBars
               config={OWN_POPULATION}
-              blocks={[{ rows: backgroundRows }]}
+              blocks={backgroundCompositionBlocks}
             />
-            <RateBars
-              config={OWN_POPULATION}
-              blocks={[{ rows: generationRows }]}
-            />
-          </div>
-        )}
-      </Card>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <RateBars
+                config={OWN_POPULATION}
+                blocks={[{ rows: backgroundRows }]}
+              />
+              <RateBars
+                config={OWN_POPULATION}
+                blocks={[{ rows: generationRows }]}
+              />
+            </div>
+          )}
+        </Card>
+      )}
       <Card
         title="Education and income gradient"
         year={Math.max(s.educationIncome.educationYear, s.educationIncome.incomeYear)}
