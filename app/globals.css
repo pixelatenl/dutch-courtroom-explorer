@@ -234,10 +234,16 @@
   palette discipline.
 
   The stack group is retuned for intra-chart distinctness: each token
-  keeps one hue family across themes (1 blue/indigo, 2 amber, 3 green,
-  4 cyan, 5 crimson, 6 magenta, 7 violet), so a category keeps its
-  colour identity when the theme switches. An earlier rule that the
-  stack group avoid the funnel and offence hues is withdrawn as
+  keeps one hue family across themes (1 blue/indigo, 2 amber/gold,
+  3 green, 4 cyan/mint, 5 crimson, 6 magenta/rose, 7 violet/plum), so
+  a category keeps its colour identity when the theme switches. Two
+  documented hue bends in the dark theme only: token 4 leans mint
+  rather than cyan, because a cyan tint sinks into the teal-family
+  dark card and reads as gray while a mint tint reads clearly as green
+  (the light theme keeps cyan); and token 7 leans from violet toward
+  plum, widening the crimson-to-plum pair to CIEDE2000 21.7, the
+  closest pair in the palette by design margin. An earlier rule that
+  the stack group avoid the funnel and offence hues is withdrawn as
   unachievable in principle — the offence group already spans teal,
   orange, red, blue, purple, green and plum, and honouring the old
   rule pushed the dark band into near-black values that failed the
@@ -261,16 +267,18 @@
   card), neighbours 3.17, 3.22, 3.25; offence 11.4, 3.6, 11.6, 3.6,
   11.6, 3.7, 11.8 against the page (9.6, 3.0, 9.8, 3.0, 9.8, 3.1,
   10.0 against the card), neighbours 3.19, 3.26, 3.27, 3.26, 3.18,
-  3.23; stack 3.70, 11.52, 3.73, 11.50, 3.72, 11.51, 3.71 against
-  the page (3.12, 9.74, 3.15, 9.72, 3.14, 9.72, 3.13 against the
-  card), neighbours 3.12, 3.09, 3.08, 3.10, 3.10, 3.10. The light
+  3.23; stack 3.60, 11.02, 3.60, 11.03, 3.62, 10.99, 3.63 against
+  the page (3.04, 9.31, 3.04, 9.32, 3.06, 9.28, 3.07 against the
+  card), neighbours 3.06, 3.06, 3.06, 3.05, 3.04, 3.03. The light
   stack band sits at roughly 3.3-3.6 against the surfaces and the
   dark band at 11.0-12.1; in the dark theme the dim band sits at
-  roughly 3.1 against the card with strong chroma and the bright band
-  at roughly 9.7-11.5 with tinted rather than neutral whites. Within
+  roughly 3.04-3.07 against the card with strong chroma and the bright
+  band at roughly 9.3, having spent the luminance headroom the 3-to-1
+  gates allow on chroma, so the bright tints read as their own hue
+  families (gold, mint, rose) instead of near-identical whites. Within
   a band (dark/light pair of the same step) tokens are never adjacent
   in a chart; they are separated by the alternating band step of at
-  least 3.08 to 1 plus hue, the same documented fallback the
+  least 3.03 to 1 plus hue, the same documented fallback the
   drivetrain palette uses for its non-adjacent pairs.
 
   Perceptual distinctness audit (CIEDE2000, D65, 2 degrees, computed
@@ -279,11 +287,17 @@
   dark theme. The invisible courtroom uses tokens 1-7, the sanction
   shift 1-4, the jail snapshot 1-6. Achieved minima: light 20.5
   (invisible courtroom, weakest pair 1-7), 39.0 (sanction shift, 3-4),
-  37.1 (jail snapshot, 1-6); dark 17.0 on all three charts (weakest
-  pair 2-4, cream versus ice). The dark floor is lower honestly and for
-  a stated reason: the 3-to-1 surface and adjacency gates on near-white
-  bright-band tokens cap their chroma, so tinted pastels are the best
-  achievable within the discipline.
+  37.1 (jail snapshot, 1-6); dark 21.7 (invisible courtroom, weakest
+  pair 5-7, crimson versus plum), 25.2 (sanction shift and jail
+  snapshot, weakest pair 2-4, gold cream versus mint). The dark floor
+  is lower honestly and for a stated reason: the 3-to-1 surface and
+  adjacency gates on near-white bright-band tokens cap their chroma,
+  so tinted pastels are the best achievable within the discipline.
+  The rose tint stays pale by arithmetic, not by oversight: at the
+  luminance the 3-to-1 adjacency chain forces, a pink tint cannot
+  exceed chroma about 13 (the committed rose carries 10.4), and the
+  pair distances carry its distinctness instead (29.5 against the
+  gold cream, 39.6 against the mint).
 */
 :root {
   --funnel-1: #0f2d33;
@@ -318,13 +332,13 @@
   --offence-dui: #f1f0f4;
   --offence-drugs: #6b906a;
   --offence-sexual: #fceff6;
-  --stack-1: #5d87d6;
-  --stack-2: #f9f0d0;
-  --stack-3: #3f9a52;
-  --stack-4: #ddf4f8;
-  --stack-5: #d3676e;
-  --stack-6: #fcebf8;
-  --stack-7: #bb6eaa;
+  --stack-1: #5985d6;
+  --stack-2: #ffeb9a;
+  --stack-3: #3e9751;
+  --stack-4: #9cffce;
+  --stack-5: #d2646b;
+  --stack-6: #ffe4eb;
+  --stack-7: #b96ab6;
 }
 
 @theme inline {
