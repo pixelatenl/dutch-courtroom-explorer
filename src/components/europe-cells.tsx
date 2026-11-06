@@ -10,6 +10,7 @@ import {
   formatPercent,
   formatRate,
   formatCell,
+  formatYear,
   nlOccupancy,
 } from "@/data/snapshot";
 
@@ -47,7 +48,7 @@ export function EuropeCells() {
                 label: "Persons held per 100,000",
                 value: formatCell(r.rate, (v) => formatRate(v, 1)),
               },
-              { label: "Year", value: formatCell(e.year, formatNumber) },
+              { label: "Year", value: formatCell(e.year, formatYear) },
             ];
             if (isNL) {
               rows_tt.push(

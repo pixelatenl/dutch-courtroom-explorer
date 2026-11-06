@@ -217,6 +217,16 @@ export function formatNumber(value: number | null | undefined): string {
   return new Intl.NumberFormat("en-GB").format(value);
 }
 
+/*
+  Years are calendar labels, not quantities: no thousands grouping,
+  no separators, no locale decoration, so a four-digit year always
+  prints as itself. Null stays n/a.
+*/
+export function formatYear(value: number | null | undefined): string {
+  if (value === null || value === undefined) return "n/a";
+  return String(value);
+}
+
 export function formatNumberSigned(value: number | null | undefined): string {
   if (value === null || value === undefined) return "n/a";
   return new Intl.NumberFormat("en-GB", { signDisplay: "always" }).format(value);

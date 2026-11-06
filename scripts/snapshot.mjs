@@ -504,6 +504,10 @@ const BACKGROUND_KEYS = [
   "2012605",
   "2012655",
   "2012657",
+  // Unknown migration background: its rate is suppressed by CBS and
+  // stays null, but its count closes the background level exactly
+  // (Dutch + migration + unknown = all registered suspects).
+  "2012659",
 ];
 
 async function fetchBackgroundGeneration(retrievedAt, info) {
