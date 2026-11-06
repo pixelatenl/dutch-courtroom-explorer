@@ -90,6 +90,23 @@ export function MethodDrawer() {
               ({dji.version}, data year {dji.dataYear}), manual block: cost per
               detainee per day and average usable capacity.
             </li>
+            <li className="text-xs">
+              Photo by{" "}
+              <a
+                href="https://unsplash.com/@emilianobar"
+                className="underline underline-offset-4 hover:text-foreground"
+              >
+                Emiliano Bar
+              </a>{" "}
+              on{" "}
+              <a
+                href="https://unsplash.com/photos/empty-room-PaKHbtTDqt0"
+                className="underline underline-offset-4 hover:text-foreground"
+              >
+                Unsplash
+              </a>
+              .
+            </li>
           </ul>
         </section>
 

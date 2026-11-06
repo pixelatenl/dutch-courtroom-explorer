@@ -381,3 +381,75 @@
 @theme inline {
   --shadow-tooltip: var(--tooltip-shadow);
 }
+
+/*
+  Odds coda photo treatment, product-owned (appended product section,
+  never the family sheet above). Mirrors the Ferrari coda on
+  fleet.pixelate.nl, adapted to the self-hosted landscape Alcatraz cell
+  photo in public/images/ ("empty room" by Emiliano Bar, Unsplash
+  License): the cell — the bright, barred opening — sits in the right
+  two-thirds of the frame, around mid-height, while the left third is
+  dark corridor. The crop therefore biases right (85%) so the cell stays
+  in frame on the narrow, height-driven crops, and up (40%) on the wide,
+  width-driven crops so the room stays visible in the clear zone above
+  the content. The photo layer and the overlay layer are decorative and
+  aria-hidden; the background-image lives here, in this one rule, and
+  nowhere else.
+*/
+.odds-coda-photo {
+  background-image: url("/images/alcatraz-cell-emiliano-bar.jpg");
+  background-position: 85% 40%;
+}
+
+/*
+  Odds coda overlay. The closing photo is the only place on the page
+  where body text sits over an untreated photo, so the gradient leans on
+  the theme's background token exactly like the fleet coda overlay:
+  near-solid at the base, where the copy, stat row, and closing line sit,
+  fading up so the cell stays visible. The token differs per theme,
+  which is all the theming this needs.
+*/
+.odds-coda-overlay {
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--background) 97%, transparent),
+    color-mix(in oklab, var(--background) 84%, transparent) 38%,
+    color-mix(in oklab, var(--background) 38%, transparent) 70%,
+    transparent
+  );
+}
+
+/*
+  Mobile coda legibility. Below sm the content block fills nearly the
+  whole height of the tall narrow crop, so the bottom-only gradient
+  leaves the kicker, heading, and copy floating over the photo. The
+  scrim then darkens from both directions: the original bottom gradient
+  stays, and a top gradient lays heavy darkening over the heading and
+  copy zones, fading before the bottom scrim takes over. The scrim, not
+  text color or size, carries the contrast: the gradient guarantees the
+  content block sits over near-solid --background in both themes, so
+  every text element over the photo reads at its normal page contrast.
+  The photo is black and white, so no hue work is needed.
+*/
+@media (width < 40rem) {
+  .odds-coda-photo {
+    background-position: 95% 40%;
+  }
+  .odds-coda-overlay {
+    background:
+      linear-gradient(
+        to top,
+        color-mix(in oklab, var(--background) 97%, transparent),
+        color-mix(in oklab, var(--background) 84%, transparent) 38%,
+        color-mix(in oklab, var(--background) 38%, transparent) 70%,
+        transparent
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--background) 90%, transparent),
+        color-mix(in oklab, var(--background) 78%, transparent) 34%,
+        color-mix(in oklab, var(--background) 52%, transparent) 60%,
+        transparent 80%
+      );
+  }
+}

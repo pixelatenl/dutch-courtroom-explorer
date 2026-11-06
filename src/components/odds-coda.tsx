@@ -1,19 +1,26 @@
-import { FamilySection } from "@/components/family-section";
-import { StatCard } from "@/components/stat-card";
 import {
   snapshot,
   formatNumber,
-  formatRate,
+  formatPercent,
   oneIn,
   latestHomicide,
   annualStockCost,
 } from "@/data/snapshot";
 
 /*
-  The odds coda: three explicitly constructed probabilities and the
-  cost punchline, Ferrari-coda tone. Every probability is built from a
-  snapshot rate at render time; the cost figures are the DJI per-day
-  figures and their derived per-year multiples.
+  The odds coda: the family's closing-photo coda, the same composition as
+  the Ferrari coda on fleet.pixelate.nl. Deliberately not a Card and no
+  FamilySection: a full-bleed photo inside the page container, with the
+  kicker, heading, copy, stat row and closing line stacked over a themed
+  scrim. The photo and overlay layers are decorative and aria-hidden.
+
+  Every figure is a snapshot value or a render-time derivation: the odds
+  come from oneIn over the snapshot rates, the percentages from the same
+  rates over the same denominators, the bill from the DJI per-day figure
+  and the existing annualStockCost export. The only numeric literals are
+  the unit denominators of oneIn/formatPercent, the formatter digit
+  arguments, and the calendar 365 in the derivation phrases. A suppressed
+  (null) rate stays "n/a" everywhere, never zero.
 */
 export function OddsCoda() {
   const s = snapshot;
@@ -24,60 +31,57 @@ export function OddsCoda() {
 
   const perDay = s.costs.costPerDetaineePerDayEur.regular;
   const perYear = s.costs.costPerDetaineePerYearEur.regular;
+  const ppcPerYear = s.costs.costPerDetaineePerYearEur.ppc;
   const stockTotal =
     s.prisonStock.byLegalStatus.find((r) => r.key === "T001557")?.count ??
     null;
 
+  /*
+    The percentage of a "1 in N" odd: the same rate over the same
+    denominator. The null check keeps a suppressed cell at "n/a" instead
+    of letting null coerce to zero.
+  */
+  const percentOf = (rate: number | null, per: number, digits: number) =>
+    formatPercent(rate === null ? null : rate / per, digits);
+  const percentSuspect = percentOf(suspectRate, 10000, 2);
+  const percentPrison = percentOf(prisonRate, 100000, 3);
+  const percentVictim = percentOf(victimRate, 1000000, 5);
+
   return (
-    <FamilySection
-      title="The odds coda"
-      description={
-        <>
-          Three chances, each constructed from a rate in the snapshot, and
-          what a year inside costs. All figures derived; nothing here is a
-          guess.
-        </>
-      }
-    >
-      <div className="flex flex-col gap-5">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <StatCard
-            label={`Chance of being a registered suspect, ${s.suspects.year}`}
-            value={oneIn(suspectRate, 10000)}
-            sub={`per year: ${formatRate(suspectRate, 1)} suspects per 10,000 inhabitants (CBS ${s.suspects.year})`}
-          />
-          <StatCard
-            label={`Chance of being held in prison, ${s.europe.year}`}
-            value={oneIn(prisonRate, 100000)}
-            sub={`on a given day: ${formatRate(prisonRate, 1)} persons held per 100,000 inhabitants (Eurostat ${s.europe.year})`}
-          />
-          <StatCard
-            label={`Chance of being a murder or manslaughter victim, ${latestHomicide.year}`}
-            value={oneIn(victimRate, 1000000)}
-            sub={`per year: ${formatRate(victimRate, 1)} victims per million inhabitants, ${formatNumber(latestHomicide.victims)} victims in total (CBS ${latestHomicide.year})`}
-          />
-        </div>
-        <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            And the bill: each year a person spends detained costs society
-            roughly{" "}
-            <span className="font-semibold text-brand-accent tabular-nums">
-              €{formatNumber(perYear)}
-            </span>{" "}
-            in the regular regime (derived: €{formatNumber(perDay)} per day
-            times 365; a PPC care place runs{" "}
-            <span className="tabular-nums">€{formatNumber(s.costs.costPerDetaineePerYearEur.ppc)}</span>{" "}
-            a year). Holding the{" "}
-            <span className="font-semibold text-foreground tabular-nums">
-              {formatNumber(stockTotal)}
-            </span>{" "}
-            people who were in prison on 30 September {s.prisonStock.year}
-            costs about{" "}
-            <span className="font-semibold text-brand-accent tabular-nums">
-              €{formatNumber(annualStockCost)}
-            </span>{" "}
-            a year (derived: stock times €{formatNumber(perDay)} times 365).
-            Source for the per-day figures:{" "}
+    <section>
+      <div className="relative flex min-h-[26rem] flex-col justify-end overflow-hidden rounded-2xl sm:min-h-[34rem] lg:min-h-[70vh]">
+        <div
+          aria-hidden="true"
+          className="odds-coda-photo absolute inset-0 bg-cover"
+        />
+        <div
+          aria-hidden="true"
+          className="odds-coda-overlay absolute inset-0"
+        />
+        <div className="relative flex flex-col gap-5 p-6 sm:gap-6 sm:p-10 lg:p-12">
+          <p className="self-start rounded-full bg-primary px-3 py-1 text-sm font-medium tracking-wide text-primary-foreground uppercase">
+            Not a chance calculation
+          </p>
+          <h2 className="max-w-4xl text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+            Three odds and <span className="text-brand-accent">a bill</span>
+          </h2>
+          <p className="max-w-3xl text-base leading-relaxed sm:text-lg">
+            You made it to the end of a page about crime and punishment, so
+            here is the traditional closing gimmick: three odds and a bill.
+            In {s.suspects.year}, {oneIn(suspectRate, 10000)} of the
+            population was registered as a suspect; on a given day in{" "}
+            {s.europe.year}, {oneIn(prisonRate, 100000)} was inside; and in{" "}
+            {latestHomicide.year}, {oneIn(victimRate, 1000000)} was a victim
+            of murder or manslaughter. And to be clear: none of these are
+            chance calculations, and none of them are about you. The
+            registers behind them do not know who you are, where you live, or
+            how you live; each figure is a population divided by a headcount.
+            The bill, at least, is simple arithmetic: a year inside costs{" "}
+            {`€${formatNumber(perYear)}`} per detainee in the regular regime
+            (a PPC care place runs {`€${formatNumber(ppcPerYear)}`}), and
+            holding everyone who was in prison on 30 September{" "}
+            {s.prisonStock.year} for a year costs{" "}
+            {`€${formatNumber(annualStockCost)}`}. Costs:{" "}
             <a
               href={s.costs.provenance.url}
               className="underline underline-offset-4 hover:text-foreground"
@@ -86,8 +90,71 @@ export function OddsCoda() {
             </a>{" "}
             ({s.costs.provenance.version}).
           </p>
+          <div className="grid grid-cols-2 gap-x-10 gap-y-6 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-14 lg:gap-y-0">
+            <div>
+              <p className="text-3xl font-bold tabular-nums text-foreground">
+                {oneIn(suspectRate, 10000)}
+              </p>
+              <p className="mt-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+                Registered suspect
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {percentSuspect} of the population per year, {s.suspects.year}
+              </p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold tabular-nums text-foreground">
+                {oneIn(prisonRate, 100000)}
+              </p>
+              <p className="mt-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+                Behind bars
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {percentPrison} on a given day, {s.europe.year}
+              </p>
+            </div>
+            <div>
+              <p className="text-xl font-bold tabular-nums text-foreground">
+                {oneIn(victimRate, 1000000)}
+              </p>
+              <p className="mt-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+                Murder or manslaughter victim
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {percentVictim} of the population per year,{" "}
+                {latestHomicide.year}
+              </p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold tabular-nums text-brand-accent">
+                {`€${formatNumber(perYear)}`}
+              </p>
+              <p className="mt-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+                One year inside
+              </p>
+              <p className="text-xs text-muted-foreground">
+                derived: {`€${formatNumber(perDay)}`} per day, times 365
+              </p>
+            </div>
+            <div className="col-span-2 lg:col-span-1">
+              <p className="text-3xl font-bold tabular-nums text-brand-accent sm:text-4xl lg:text-[clamp(0.875rem,1.45vw,1.25rem)]">
+                {`€${formatNumber(annualStockCost)}`}
+              </p>
+              <p className="mt-1 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+                Everyone inside, one year
+              </p>
+              <p className="text-xs text-muted-foreground">
+                derived: {formatNumber(stockTotal)} people on 30 September{" "}
+                {s.prisonStock.year}
+              </p>
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Who ends up in a Dutch courtroom? These are not the numbers that
+            will tell you.
+          </p>
         </div>
       </div>
-    </FamilySection>
+    </section>
   );
 }
