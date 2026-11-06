@@ -538,7 +538,11 @@ export const funnel = (() => {
   };
 })();
 
-/** Hero funnel stage cards, each with its own source year. */
+/*
+  Hero funnel stage cards, each with its own source year. Kept for the
+  SEO meta description in app/layout.tsx, which is out of scope for
+  the hero strip rewrite; the page hero renders heroStats below.
+*/
 export const heroStages = [
   {
     key: "crimes",
@@ -569,6 +573,101 @@ export const heroStages = [
     provenance: snapshot.justice.provenance,
   },
 ];
+
+export interface HeroStat {
+  key: string;
+  label: string;
+  /** The formatted figure: a grouped count or a signed percent. */
+  value: string;
+  /** Muted source line: table and derived year, copy with derived slots. */
+  source: string;
+}
+
+/*
+  The eight hero stats of the borderless strip under the hero, all
+  from the latest published year of each series. Built render-time
+  from the snapshot rows: the last crime row, the first and last
+  homicide rows, the prison stock total, the detainee total, and the
+  derived DJI cost per detainee per year. No figure or year is
+  hand-written here.
+*/
+export const heroStats: HeroStat[] = (() => {
+  const crimeTable = snapshot.crime.provenance.table ?? "StatLine";
+  const homicideTable = snapshot.homicide.provenance.table ?? "StatLine";
+  const detaineeTable = snapshot.detainees.provenance.table ?? "StatLine";
+  const stockTable = snapshot.prisonStock.provenance.table ?? "StatLine";
+
+  const firstHomicide = homicideYears[0];
+  const homicideDrop =
+    firstHomicide.victims !== null &&
+    latestHomicide.victims !== null &&
+    firstHomicide.victims !== 0
+      ? (latestHomicide.victims - firstHomicide.victims) / firstHomicide.victims
+      : null;
+
+  const prisonStockTotal =
+    snapshot.prisonStock.byLegalStatus.find((r) => r.key === "T001557")
+      ?.count ?? null;
+  const detaineesTotal =
+    snapshot.detainees.byPreviousDetention.find((r) => r.key === "T001670")
+      ?.count ?? null;
+  const costPerYear = snapshot.costs.costPerDetaineePerYearEur.regular;
+  const costPerDay = snapshot.costs.costPerDetaineePerDayEur.regular;
+  const costYear = snapshot.costs.provenance.dataYear;
+
+  const crimeYear = formatYear(latestCrime.year);
+
+  return [
+    {
+      key: "crimes",
+      label: "Registered crimes",
+      value: formatNumber(latestCrime.total),
+      source: `CBS StatLine ${crimeTable}, ${crimeYear}`,
+    },
+    {
+      key: "suspects",
+      label: "Suspect registrations",
+      value: formatNumber(latestCrime.suspectRegistrations),
+      source: `CBS StatLine ${crimeTable}, ${crimeYear}`,
+    },
+    {
+      key: "homicide",
+      label: "Murder and manslaughter victims",
+      value: formatNumber(latestHomicide.victims),
+      source: `CBS StatLine ${homicideTable}, ${formatYear(latestHomicide.year)}`,
+    },
+    {
+      key: "homicide-drop",
+      label: `Down since ${formatYear(firstHomicide.year)}`,
+      value: formatPercent(homicideDrop, 0),
+      source: `from ${formatNumber(firstHomicide.victims)} victims in ${formatYear(firstHomicide.year)} to ${formatNumber(latestHomicide.victims)} in ${formatYear(latestHomicide.year)}`,
+    },
+    {
+      key: "prison-stock",
+      label: "Behind bars",
+      value: formatNumber(prisonStockTotal),
+      source: `30 September ${formatYear(snapshot.prisonStock.year)}, CBS StatLine ${stockTable}`,
+    },
+    {
+      key: "detainees",
+      label: "Detained during the year",
+      value: formatNumber(detaineesTotal),
+      source: `CBS StatLine ${detaineeTable}, ${formatYear(snapshot.detainees.year)}`,
+    },
+    {
+      key: "cleared",
+      label: "Crimes cleared",
+      value: formatNumber(latestCrime.cleared),
+      source: `${formatNumber(latestCrime.clearanceRate)} percent, CBS StatLine ${crimeTable}, ${crimeYear}`,
+    },
+    {
+      key: "cost",
+      label: "One detainee, one year",
+      value: formatNumber(costPerYear),
+      source: `DJI, ${formatYear(costYear)} basis (€${formatNumber(costPerDay)} per day times 365, derived)`,
+    },
+  ];
+})();
 
 /** Eurostat occupancy of the Netherlands, derived at render time. */
 export const nlOccupancy =
