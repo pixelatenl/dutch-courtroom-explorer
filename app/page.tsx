@@ -1,5 +1,4 @@
 import { FamilyHero } from "@/components/family-hero";
-import { StatCard } from "@/components/stat-card";
 import { VanishingCrime } from "@/components/vanishing-crime";
 import { DockChart } from "@/components/dock-chart";
 import { InvisibleCourtroom } from "@/components/invisible-courtroom";
@@ -13,21 +12,18 @@ import { OddsCoda } from "@/components/odds-coda";
 import { FAMILY } from "@/lib/family";
 import {
   snapshot,
-  heroStages,
-  formatNumber,
+  heroStats,
+  latestCrime,
+  formatYear,
 } from "@/data/snapshot";
 
 /*
   The single page. Card order per the research brief. Every figure is
   computed from the snapshot at render time; the only literals here
-  are copy. The hero stat cards each carry their own source year.
+  are copy. The hero is a borderless strip of the eight heroStats
+  entries, each with its own source line and derived year.
 */
 export default function Home() {
-  const crimes = heroStages[0];
-  const suspects = heroStages[1];
-  const verdicts = heroStages[2];
-  const prison = heroStages[3];
-
   return (
     <>
       <div className="mx-auto max-w-[1536px] px-4 py-10 sm:px-6 sm:py-16">
@@ -39,38 +35,23 @@ export default function Home() {
                 Who ends up in a <span className="text-brand-accent">Dutch courtroom</span>, and what happens to them?
               </>
             }
-            deck={
-              <>
-                From {formatNumber(crimes.value)} registered crimes in{" "}
-                {crimes.year} to {formatNumber(prison.value)} prison sentences
-                in {prison.year}, this page follows the numbers through the
-                Dutch criminal justice chain, card by card. Every figure is
-                open data, embedded in this page at build time.
-              </>
-            }
+            deck={`Eight numbers from ${formatYear(latestCrime.year)}. How much crime the country registers, how few people are killed, who sits in its cells, and what a year inside costs. Every figure is open data, embedded in this page at build time.`}
             retrievedAt={snapshot.retrievedAt}
           />
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-              label={crimes.label}
-              value={formatNumber(crimes.value)}
-              sub={`CBS StatLine 83723NED, ${crimes.year}`}
-            />
-            <StatCard
-              label={suspects.label}
-              value={formatNumber(suspects.value)}
-              sub={`CBS StatLine 83723NED, ${suspects.year}`}
-            />
-            <StatCard
-              label={verdicts.label}
-              value={formatNumber(verdicts.value)}
-              sub={`CBS StatLine 83944NED, ${verdicts.year}`}
-            />
-            <StatCard
-              label={prison.label}
-              value={formatNumber(prison.value)}
-              sub={`CBS StatLine 83944NED, ${prison.year}`}
-            />
+          <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-10 sm:gap-x-10 lg:grid-cols-4">
+            {heroStats.map((stat) => (
+              <div key={stat.key}>
+                <p className="text-4xl font-extrabold tracking-tight tabular-nums sm:text-5xl text-foreground">
+                  {stat.key === "cost" ? `€${stat.value}` : stat.value}
+                </p>
+                <p className="mt-2 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+                  {stat.label}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {stat.source}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 
