@@ -2975,6 +2975,12 @@
         "count": 31680,
         "per10000": 86,
         "title": "Westerse migratieachtergrond"
+      },
+      {
+        "key": "2012659",
+        "count": 880,
+        "per10000": null,
+        "title": "Onbekend migratieachtergrond"
       }
     ],
     "byGeneration": [
