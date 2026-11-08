@@ -3875,7 +3875,7 @@
       "sanctions": "In 2022, 32.5% of Dutch court sanctions were prison sentences and 25.0% were community service, while in 2001 only 15.3% were community service and 30.5% were fines.",
       "catch": "The chart shows the share of registered suspects by sex. Men make up 83.0% of suspects while women make up 16.6%.",
       "jail": "In 2025 there are 9,700 detainees, a 36.2% drop from 2005, and 19.5% of them face sentences of 3 years or longer.",
-      "europe": "The chart ranks Europe’s 35 Eurostat countries by prison population per 100,000 inhabitants in 2024, with the Netherlands at 66.59 and 32nd lowest. Its prisons are 94.7% full."
+      "europe": "The chart ranks 35 European countries by prison population per 100,000 inhabitants in 2024, with the Netherlands highlighted at 66.59 and 32nd place. Its prisons are 94.7% full, holding 11,948 of 12,614 available places."
     },
     "signatures": {
       "vanishingCrime": "89558fb8471b84498b508f477d6b177826899c6316ffaa5208643d6d234a3fa0",
@@ -3886,7 +3886,7 @@
       "sanctions": "a1189bf0f478d0d608a147c5a61add8aba2f165d318c303bfc2ecc7238a9eae0",
       "catch": "69de933c29d2518d9df4171534f762c6da743a6669a15134f6745ed0a2b623cb",
       "jail": "62210c56a3a64f3a17eaec101de3db8e73cda66ba952a744d12bdc10bcb378d6",
-      "europe": "24da5b0a40fb50ffd34a0044cb4b2505e91a16d50b50f2bd26349dbf1bca8163"
+      "europe": "14e2f648c9422e7b487732a26165d2a772199ca7d51bfe163adc09f67a98f1bf"
     }
   }
 }

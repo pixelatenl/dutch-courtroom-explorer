@@ -399,7 +399,7 @@ export function visualContexts(snapshot) {
       `Netherlands: ${nl.ratePer100k} per 100,000 (${nl.year}), ${ordinal(rank)} of the ${rates.length} countries; only ${lowerList} sit lower.`,
       `Highest: ${highestRate.label} ${highestRate.rate} per 100,000.`,
       `Netherlands capacity: ${format(nl.capacity ?? 0)} places, ${format(nl.held ?? 0)} persons held, ${occupancy} occupancy (derived).`,
-      "Guidance: state the Netherlands' position among the countries and its occupancy.",
+      "Guidance: state the Netherlands' position as its rank among all the countries in the rank line's wording, never as an ordinal of lowest, and state its occupancy.",
     ].join("\n");
   }
 
