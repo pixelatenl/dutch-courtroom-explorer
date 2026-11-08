@@ -1,4 +1,5 @@
 import { FamilySection } from "@/components/family-section";
+import { AiInsight } from "@/components/ai-insight";
 import { linearScale } from "@/components/chart-utils";
 import {
   ChartTooltip,
@@ -80,6 +81,7 @@ export function JailSnapshot() {
   const costs = snapshot.costs;
   const stockTotal =
     stock.byLegalStatus.find((r) => r.key === "T001557")?.count ?? null;
+  const insights = snapshot.narration?.visuals;
 
   return (
     <FamilySection
@@ -273,6 +275,7 @@ export function JailSnapshot() {
           </p>
         </div>
       </ChartTooltipContainer>
+      {insights?.jail && <AiInsight text={insights.jail} />}
     </FamilySection>
   );
 }

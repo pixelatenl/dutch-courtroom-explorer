@@ -1,4 +1,5 @@
 import { FamilySection } from "@/components/family-section";
+import { AiInsight } from "@/components/ai-insight";
 import {
   ChartTooltip,
   ChartTooltipContainer,
@@ -74,6 +75,7 @@ export function DockChart() {
   const total = rows.reduce((sum, r) => sum + (r.count ?? 0), 0);
   const top = rows.find((r) => r.count !== null);
   const year = snapshot.suspects.year;
+  const insights = snapshot.narration?.visuals;
   return (
     <FamilySection
       title="Who is in the dock"
@@ -161,6 +163,7 @@ export function DockChart() {
           group.
         </p>
       </ChartTooltipContainer>
+      {insights?.dock && <AiInsight text={insights.dock} />}
     </FamilySection>
   );
 }

@@ -216,6 +216,9 @@ export function MethodDrawer() {
             refreshes monthly (the sources publish annually) via the
             snapshot workflow, which commits src/data/snapshot.json to main.
           </p>
+          <ul className="mt-1 flex flex-col gap-1">
+            <li>The AI insight blocks beneath the charts are generated at data-refresh time by Mistral (mistral-small-latest) from the same committed snapshot aggregates that power the charts. Every figure is computed from the cited open data sources and only the explanation text is AI-generated; the feature is experimental and a narration regenerates only when the data changes.</li>
+          </ul>
         </section>
       </div>
     </Drawer>

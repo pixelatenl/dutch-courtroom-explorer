@@ -125,6 +125,39 @@ export interface CountryRate {
   rate: number | null;
 }
 
+/**
+ * AI insight narrations, generated at snapshot time by Mistral from
+ * the same aggregates that power the charts. All fields optional: a
+ * run without the API key or a failed narration simply stores less.
+ */
+export interface Narration {
+  /** SHA-256 of each visual's narration context: the exact aggregates
+   *  the stored text was generated from and validated against. A
+   *  visual is re-narrated only when its context hash changes. */
+  signatures?: {
+    vanishingCrime?: string;
+    dock?: string;
+    courtroom?: string;
+    funnel?: string;
+    sanctions?: string;
+    clearance?: string;
+    catch?: string;
+    jail?: string;
+    europe?: string;
+  };
+  visuals: {
+    vanishingCrime?: string;
+    dock?: string;
+    courtroom?: string;
+    funnel?: string;
+    sanctions?: string;
+    clearance?: string;
+    catch?: string;
+    jail?: string;
+    europe?: string;
+  };
+}
+
 export interface Snapshot {
   retrievedAt: string;
   sources: {
@@ -204,6 +237,7 @@ export interface Snapshot {
     costPerDetaineePerYearEur: { regular: number; ppc: number; derived: boolean };
     averageUsableCapacity: { value: number; year: number; note: string };
   };
+  narration?: Narration;
 }
 
 export const snapshot = raw as Snapshot;

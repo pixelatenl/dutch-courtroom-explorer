@@ -5,6 +5,10 @@ name: Refresh data snapshot
 # Writes src/data/snapshot.json and commits it to main, which triggers
 # the build workflow. CBS and Eurostat publish annually, so a monthly
 # cadence is ample.
+#
+# The Mistral key is present only on this job (scheduled and manual
+# dispatch alike); the push and PR build jobs run without it and the
+# snapshot script skips narration when the key is absent.
 
 on:
   schedule:
@@ -25,6 +29,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: node scripts/snapshot.mjs
+        env:
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
       - name: Commit snapshot if changed
         run: |
           git config user.name "courtroom-snapshot-bot"

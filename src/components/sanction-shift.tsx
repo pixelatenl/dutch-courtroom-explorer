@@ -1,10 +1,12 @@
 import { FamilySection } from "@/components/family-section";
+import { AiInsight } from "@/components/ai-insight";
 import { linearScale } from "@/components/chart-utils";
 import {
   ChartTooltip,
   ChartTooltipContainer,
 } from "@/components/chart-tooltip";
 import {
+  snapshot,
   justiceYears,
   firstJustice,
   latestJustice,
@@ -39,6 +41,7 @@ export function SanctionShift() {
 
   const last = latestJustice;
   const total = last.sanctionsTotal ?? 1;
+  const insights = snapshot.narration?.visuals;
 
   return (
     <FamilySection
@@ -161,6 +164,7 @@ export function SanctionShift() {
           (opgelegde sancties, hoofdstraffen).
         </p>
       </ChartTooltipContainer>
+      {insights?.sanctions && <AiInsight text={insights.sanctions} />}
     </FamilySection>
   );
 }

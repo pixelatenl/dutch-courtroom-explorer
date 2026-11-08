@@ -1,4 +1,5 @@
 import { FamilySection } from "@/components/family-section";
+import { AiInsight } from "@/components/ai-insight";
 import {
   ChartTooltip,
   ChartTooltipContainer,
@@ -26,6 +27,7 @@ export function EuropeCells() {
   const rows = [...e.ratesPer100k].sort((a, b) => (b.rate ?? -1) - (a.rate ?? -1));
   const max = Math.max(1, ...rows.map((r) => r.rate ?? 0));
   const nl = e.netherlands;
+  const insights = snapshot.narration?.visuals;
 
   return (
     <FamilySection
@@ -117,6 +119,7 @@ export function EuropeCells() {
           ({e.provenance.license}), {e.year}.
         </p>
       </ChartTooltipContainer>
+      {insights?.europe && <AiInsight text={insights.europe} />}
     </FamilySection>
   );
 }

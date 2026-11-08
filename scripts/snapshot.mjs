@@ -11,9 +11,15 @@
   Usage: node scripts/snapshot.mjs
 */
 
-import { writeFile, mkdir } from "node:fs/promises";
+import { writeFile, readFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import {
+  narrate,
+  visualContexts,
+  visualSignature,
+  validateNarration,
+} from "./narration.mjs";
 
 const CBS = "https://opendata.cbs.nl/ODataApi/odata";
 const EUROSTAT =
@@ -849,5 +855,91 @@ const snapshot = {
 const outDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "../src/data");
 await mkdir(outDir, { recursive: true });
 const outFile = path.join(outDir, "snapshot.json");
+
+// Narration step: per visual, the previous narration is reused
+// whenever that visual's context signature is unchanged, and without
+// MISTRAL_API_KEY (plain push build, local run) no call is made and
+// the existing narrations are kept. A missing or failed narration
+// never fails the snapshot.
+let existingNarration = null;
+try {
+  existingNarration = JSON.parse(await readFile(outFile, "utf8")).narration ?? null;
+} catch {
+  // First run: no snapshot to reuse a narration from.
+}
+/*
+  Narration progress, per visual, derived from the same exported
+  context and signature functions narrate() uses (narrate() itself is
+  unchanged). A visual whose stored signature matches its current
+  context is kept without any API call; a stale or missing visual is
+  regenerated. The key is read from the environment only and is never
+  logged, and neither are the contexts (request payloads).
+*/
+const hasNarrationKey = (process.env.MISTRAL_API_KEY ?? "").trim() !== "";
+const narrationContexts = visualContexts(snapshot);
+const storedSignatures = existingNarration?.signatures ?? {};
+const keptVisuals = [];
+const staleVisuals = [];
+if (hasNarrationKey) {
+  for (const [key, context] of Object.entries(narrationContexts)) {
+    if (storedSignatures[key] === visualSignature(context)) {
+      keptVisuals.push(key);
+    } else {
+      staleVisuals.push(key);
+    }
+  }
+}
+try {
+  snapshot.narration = await narrate(snapshot, existingNarration);
+} catch (error) {
+  // Fail-soft: an unexpected narration error must never fail the
+  // snapshot; the existing narrations stay and this run adds none.
+  console.error(`Narration skipped: ${error.message}`);
+  snapshot.narration = existingNarration;
+}
+if (!hasNarrationKey) {
+  console.log("narration: no API key, step skipped (0 calls)");
+} else {
+  for (const key of keptVisuals) {
+    console.log(`narration: ${key} signature match, kept (0 calls)`);
+  }
+  for (const key of staleVisuals) {
+    if (snapshot.narration?.visuals?.[key]) {
+      console.log(`narration: ${key} stale, generating (call 1)... validated`);
+    } else {
+      console.log(
+        `narration: ${key} stale, generating (call 1)... rejected, retried (call 2)... hidden this run`
+      );
+    }
+  }
+}
+/*
+  Storage shape of the narrations: each visual's text is stored under
+  the SHA-256 of its own context, and revalidated against the current
+  context figures, so a stored text is kept only when every figure it
+  cites is still present — the same rule the staleness guard applies.
+  A keyed run therefore re-narrates exactly the visuals whose contexts
+  changed and makes no call for the rest.
+*/
+if (snapshot.narration) {
+  const visuals = {};
+  const signatures = {};
+  for (const [key, context] of Object.entries(narrationContexts)) {
+    const text = snapshot.narration.visuals?.[key];
+    if (text && validateNarration(text, context)) {
+      visuals[key] = text;
+      signatures[key] = visualSignature(context);
+    }
+  }
+  snapshot.narration = { visuals, signatures };
+}
+if (!snapshot.narration) delete snapshot.narration;
+
 await writeFile(outFile, JSON.stringify(snapshot, null, 2) + "\n", "utf8");
 console.log(`snapshot: wrote ${outFile} (${snapshot.crime.years.length} crime years, ${snapshot.justice.years.length} justice years)`);
+const narrated = Object.keys(snapshot.narration?.visuals ?? {});
+console.log(
+  snapshot.narration
+    ? `narration: ${narrated.length} visual(s) with an insight, each under its own context signature.`
+    : "narration: none this run."
+);
