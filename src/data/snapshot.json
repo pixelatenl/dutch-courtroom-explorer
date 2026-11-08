@@ -1,12 +1,12 @@
 {
-  "retrievedAt": "2026-11-07",
+  "retrievedAt": "2026-11-08",
   "sources": {
     "cbs": {
       "name": "CBS StatLine",
       "url": "https://statline.cbs.nl",
       "license": "CC-BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "retrievedAt": "2026-11-07",
+      "retrievedAt": "2026-11-08",
       "tables": {
         "83723NED": {
           "title": "Geregistreerde criminaliteit; tijdreeks vanaf 1948",
@@ -52,7 +52,7 @@
       "page": "https://ec.europa.eu/eurostat/databrowser/view/crim_pris_cap/default/table",
       "license": "Eurostat reuse policy",
       "licenseUrl": "https://ec.europa.eu/eurostat/about-us/policies/copyright",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "dji": {
       "source": "Dienst Justitiële Inrichtingen (DJI)",
@@ -71,7 +71,7 @@
       "page": "https://statline.cbs.nl/#/nl-nl/results/83723NED",
       "license": "CC-BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "years": [
       {
@@ -1800,7 +1800,7 @@
       "page": "https://statline.cbs.nl/#/nl-nl/results/81947NED",
       "license": "CC-BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "year": 2022,
     "bySex": [
@@ -2035,7 +2035,7 @@
       "page": "https://statline.cbs.nl/#/nl-nl/results/85658NED",
       "license": "CC-BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "educationYear": 2024,
     "incomeYear": 2024,
@@ -2130,7 +2130,7 @@
       "page": "https://statline.cbs.nl/#/nl-nl/results/83944NED",
       "license": "CC-BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "years": [
       {
@@ -2605,7 +2605,7 @@
       "page": "https://statline.cbs.nl/#/nl-nl/results/81997NED",
       "license": "CC-BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "years": [
       {
@@ -2942,7 +2942,7 @@
       "page": "https://statline.cbs.nl/#/nl-nl/results/81959NED",
       "license": "CC-BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "year": 2022,
     "byBackground": [
@@ -3018,7 +3018,7 @@
       "page": "https://statline.cbs.nl/#/nl-nl/results/85836NED",
       "license": "CC-BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "year": 2025,
     "byPreviousDetention": [
@@ -3047,7 +3047,7 @@
       "page": "https://statline.cbs.nl/#/nl-nl/results/85841NED",
       "license": "CC-BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "years": [
       {
@@ -3491,7 +3491,7 @@
       "page": "https://statline.cbs.nl/#/nl-nl/results/84726NED",
       "license": "CC-BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "years": [
       {
@@ -3654,7 +3654,7 @@
       "page": "https://ec.europa.eu/eurostat/databrowser/view/crim_pris_cap/default/table",
       "license": "Eurostat reuse policy",
       "licenseUrl": "https://ec.europa.eu/eurostat/about-us/policies/copyright",
-      "retrievedAt": "2026-11-07"
+      "retrievedAt": "2026-11-08"
     },
     "year": 2024,
     "ratesPer100k": [
@@ -3863,6 +3863,30 @@
       "value": 9833,
       "year": 2025,
       "note": "Average usable capacity of the prison system, excluding 20 police cells and rented capacity."
+    }
+  },
+  "narration": {
+    "visuals": {
+      "vanishingCrime": "The chart shows registered crimes per 1,000 inhabitants in the Netherlands from 1948 to 2025, peaking in 2002 at 93 per 1,000 and dropping to 45 per 1,000 in 2025, a 51.6% decline. Property crime remains the largest category at 25 per 1,000 in 2025.",
+      "clearance": "In 1954 the solved share of crimes peaked at 75.0% while in 2025 it fell to 22.0%, a drop of 70.7%. Registered crimes per 1,000 inhabitants dropped from 93 in 2002 to 45 in 2025, a fall of 51.6%.",
+      "dock": "The chart shows registered suspects by offence category in 2022, with property offences having the largest share of 24.6% of the categories shown.",
+      "courtroom": "In 2022, 44.1% of prosecutor decisions were summons, down from 55.5% in 2001.",
+      "funnel": "This funnel shows what happened to 810,550 crimes in 2022, with 33 per 100 leading to suspect registration and only 4 per 100 ending in a prison term. The steepest drop is between suspect registration (33 per 100) and summons (10 per 100).",
+      "sanctions": "In 2022, 32.5% of Dutch court sanctions were prison sentences and 25.0% were community service, while in 2001 only 15.3% were community service and 30.5% were fines.",
+      "catch": "The chart shows the share of registered suspects by sex. Men make up 83.0% of suspects while women make up 16.6%.",
+      "jail": "In 2025 there are 9,700 detainees, a 36.2% drop from 2005, and 19.5% of them face sentences of 3 years or longer.",
+      "europe": "The chart ranks Europe’s 35 Eurostat countries by prison population per 100,000 inhabitants in 2024, with the Netherlands at 66.59 and 32nd lowest. Its prisons are 94.7% full."
+    },
+    "signatures": {
+      "vanishingCrime": "89558fb8471b84498b508f477d6b177826899c6316ffaa5208643d6d234a3fa0",
+      "clearance": "3297186b431218e973aac4235523c2f4a03ede0b9bc63f30e75d3f6bae67e74f",
+      "dock": "ffc47203b4aa74cde0234914a6ca9ecbd1c55df888e60f2ba1dd823f85d2d826",
+      "courtroom": "1de12640a4a6d2821719d2bdde465c8ab64861695d3d4105c243a48b9777f887",
+      "funnel": "fd18a49f31dfd2d5ccf7ef1e6a788fae5224ac62bf4657c21754807a772b242a",
+      "sanctions": "a1189bf0f478d0d608a147c5a61add8aba2f165d318c303bfc2ecc7238a9eae0",
+      "catch": "69de933c29d2518d9df4171534f762c6da743a6669a15134f6745ed0a2b623cb",
+      "jail": "62210c56a3a64f3a17eaec101de3db8e73cda66ba952a744d12bdc10bcb378d6",
+      "europe": "24da5b0a40fb50ffd34a0044cb4b2505e91a16d50b50f2bd26349dbf1bca8163"
     }
   }
 }
