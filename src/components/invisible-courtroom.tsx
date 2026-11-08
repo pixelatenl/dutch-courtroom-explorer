@@ -1,10 +1,12 @@
 import { FamilySection } from "@/components/family-section";
+import { AiInsight } from "@/components/ai-insight";
 import { linearScale } from "@/components/chart-utils";
 import {
   ChartTooltip,
   ChartTooltipContainer,
 } from "@/components/chart-tooltip";
 import {
+  snapshot,
   justiceYears,
   firstJustice,
   latestJustice,
@@ -43,6 +45,7 @@ export function InvisibleCourtroom() {
   // Peak-year total for the y axis label of absolute counts.
   const totals = justiceYears.map((y) => y.omTotal ?? 0);
   const peakTotal = Math.max(...totals);
+  const insights = snapshot.narration?.visuals;
 
   return (
     <FamilySection
@@ -184,6 +187,7 @@ export function InvisibleCourtroom() {
           {latestJustice.year}.
         </p>
       </ChartTooltipContainer>
+      {insights?.courtroom && <AiInsight text={insights.courtroom} />}
     </FamilySection>
   );
 }

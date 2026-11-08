@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { FamilySection } from "@/components/family-section";
+import { AiInsight } from "@/components/ai-insight";
 import {
   ChartTooltip,
   ChartTooltipContainer,
@@ -635,6 +636,7 @@ function CardsGrid() {
 }
 
 export function CorrelationCards() {
+  const insights = snapshot.narration?.visuals;
   return (
     <FamilySection
       title="Who the system tends to catch"
@@ -654,6 +656,7 @@ export function CorrelationCards() {
       <CatchViewProvider>
         <CardsGrid />
       </CatchViewProvider>
+      {insights?.catch && <AiInsight text={insights.catch} />}
     </FamilySection>
   );
 }

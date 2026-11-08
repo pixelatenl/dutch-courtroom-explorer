@@ -1,9 +1,11 @@
 import { FamilySection } from "@/components/family-section";
+import { AiInsight } from "@/components/ai-insight";
 import {
   ChartTooltip,
   ChartTooltipContainer,
 } from "@/components/chart-tooltip";
 import {
+  snapshot,
   funnel,
   formatNumber,
   formatCell,
@@ -52,6 +54,7 @@ export function AbsorptionFunnel() {
     100,
     ...STAGES.map((s) => funnel[s.key as keyof typeof funnel] as number | null ?? 0),
   );
+  const insights = snapshot.narration?.visuals;
   return (
     <FamilySection
       title="The absorption funnel"
@@ -133,6 +136,7 @@ export function AbsorptionFunnel() {
           );
         })}
       </ChartTooltipContainer>
+      {insights?.funnel && <AiInsight text={insights.funnel} />}
     </FamilySection>
   );
 }

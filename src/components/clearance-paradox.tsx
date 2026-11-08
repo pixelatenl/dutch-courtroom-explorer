@@ -1,10 +1,12 @@
 import { FamilySection } from "@/components/family-section";
+import { AiInsight } from "@/components/ai-insight";
 import { areaPath, linearScale, linePath, niceTicks } from "@/components/chart-utils";
 import {
   ChartTooltip,
   ChartTooltipContainer,
 } from "@/components/chart-tooltip";
 import {
+  snapshot,
   clearanceSeries,
   crimeYears,
   formatPercent,
@@ -22,6 +24,7 @@ import {
 export function ClearanceParadox() {
   const first = crimeYears[0];
   const last = crimeYears[crimeYears.length - 1];
+  const insights = snapshot.narration?.visuals;
 
   const crimeValues = clearanceSeries
     .map((p) => p.crimeRate)
@@ -209,6 +212,7 @@ export function ClearanceParadox() {
           opgehelderde misdrijven relatief. Suppressed years render as gaps.
         </p>
       </ChartTooltipContainer>
+      {insights?.clearance && <AiInsight text={insights.clearance} />}
     </FamilySection>
   );
 }

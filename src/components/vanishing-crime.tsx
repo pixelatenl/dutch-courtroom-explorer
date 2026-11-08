@@ -1,5 +1,6 @@
 import { FamilySection } from "@/components/family-section";
 import { StatusChip } from "@/components/status-chip";
+import { AiInsight } from "@/components/ai-insight";
 import { areaPath, linearScale, linePath, niceTicks } from "@/components/chart-utils";
 import {
   ChartTooltip,
@@ -28,6 +29,7 @@ import {
 export function VanishingCrime() {
   const first = crimeYears[0];
   const last = crimeYears[crimeYears.length - 1];
+  const insights = snapshot.narration?.visuals;
   const totalChip = statusChip(crimeRateSeries);
   const chips = [
     { label: "Property crime", series: propertyRateSeries },
@@ -203,6 +205,7 @@ export function VanishingCrime() {
           {snapshotTable("83723NED")}. Suppressed years render as gaps.
         </p>
       </ChartTooltipContainer>
+      {insights?.vanishingCrime && <AiInsight text={insights.vanishingCrime} />}
     </FamilySection>
   );
 }
